@@ -3,6 +3,9 @@
     In the previous section you learned how to model your domains so that a parent feature can
     present a child feature. Now let's learn what has to be done if a parent feature wants to be
     able to present _many_ features.
+    
+    이전 섹션에서는 부모 feature가 자식 feature를 표시할 수 있도록 도메인을 모델링하는 방법을 배웠습니다. 
+    이제 부모 feature가 _여러_ feature를 표시할 수 있도록 하려면 무엇을 해야 하는지 알아보겠습니다.
   }
   
   @Section(title: "Delete contacts") {
@@ -13,6 +16,13 @@
       ``ComposableArchitecture/PresentationAction`` and
       ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q``, all work
       for presenting alerts from optional state too.
+      
+      연락처 목록에 연락처를 삭제할 수 있는 새로운 feature를 추가해 보겠습니다. 
+      하지만 먼저 삭제를 확인해야 합니다. 확인 단계를 알림을 사용하여 구현할 것입니다. 
+      이전 섹션에서 사용한 도구들, 예를 들어 ``ComposableArchitecture/Presents()``, 
+      ``ComposableArchitecture/PresentationAction`` 및 
+      ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q``는 
+      선택적 상태에서 알림을 표시하는 데에도 모두 사용할 수 있습니다.
     }
     
     @Steps {
@@ -20,16 +30,25 @@
         Go back to ContactsFeature.swift that we worked in from the last section. Add a new action
         that will be sent when the delete button is tapped on a row in the contacts list.
         
+        이전 섹션에서 작업한 ContactsFeature.swift로 돌아갑니다. 
+        연락처 목록의 행에서 삭제 버튼이 탭될 때 전송될 새로운 액션을 추가합니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0000.swift, previousFile: 02-02-01-code-0000-previous.swift)
       }
       
       When the delete button is tapped we want to show an alert asking the user to confirm deletion
       of the contact.
       
+      삭제 버튼이 탭되면 사용자가 연락처 삭제를 확인하도록 요청하는 알림을 표시하고자 합니다.
+      
       @Step {
         Add a piece of optional ``ComposableArchitecture/Presents()`` state to the 
         `ContactsFeature` state. We will further use `AlertState` as it allows us to describe all
         of the details of the alert in a manner that is test friendly since it is `Equatable`.
+        
+        `ContactsFeature` 상태에 선택적 ``ComposableArchitecture/Presents()`` 상태를 추가합니다. 
+        우리는 `AlertState`를 추가로 사용하여 알림의 모든 세부 사항을 설명할 수 있습니다. 
+        이는 `Equatable`이기 때문에 테스트 친화적입니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0001.swift)
       }
@@ -38,8 +57,14 @@
         Add a new case to the `ContactsFeature`'s action that represents the actions that can 
         happen in the alert. We will use ``ComposableArchitecture/PresentationAction`` for this.
         
+        `ContactsFeature`의 액션에 알림에서 발생할 수 있는 액션을 나타내는 새로운 케이스를 추가합니다. 
+        이를 위해 ``ComposableArchitecture/PresentationAction``을 사용할 것입니다.
+        
         > Note: The only choices in the alert are to cancel or confirm deletion, but we do not need 
-        to model the cancel action. That will be handled automatically for us.
+        > to model the cancel action. That will be handled automatically for us.
+        
+        > 참고: 알림에서의 선택지는 삭제를 취소하거나 확인하는 것뿐이지만, 
+        > 취소 액션을 모델링할 필요는 없습니다. 이는 자동으로 처리됩니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0002.swift)
       }
@@ -47,9 +72,14 @@
       Now that we have new state modeled in our domain for the presentation of the alert, we can
       properly implement the `deleteButtonTapped` action.
       
+      이제 알림 표시를 위한 새로운 상태가 도메인에 모델링되었으므로, 
+      `deleteButtonTapped` 액션을 제대로 구현할 수 있습니다.
+      
       @Step {
         When the delete button is tapped we can populate the `alert` state in order to ask the user
         to confirm deletion of the contact.
+        
+        삭제 버튼이 탭되면 `alert` 상태를 채워 사용자가 연락처 삭제를 확인하도록 요청할 수 있습니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0003.swift)
       }
@@ -58,6 +88,9 @@
         Integrate the alert's logic into the `ContactsFeature` by making another use of the 
         ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q`` operator.
         
+        알림의 로직을 `ContactsFeature`에 통합하기 위해 
+        ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q`` 연산자를 다시 사용합니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0004.swift)
       }
       
@@ -65,21 +98,33 @@
         Listen for when the confirmation action is sent in the alert, and at that time we can
         actually remove the element from the array.
         
+        알림에서 확인 액션이 전송될 때를 수신하고, 그때 배열에서 요소를 실제로 제거할 수 있습니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0005.swift)
       }
       
-      That's all it takes to integrate the alert it the `ContactsFeature` and implement all of its 
+      That's all it takes to integrate the alert into the `ContactsFeature` and implement all of its 
       logic. Next we need to integrate the alert into the view. The library ships a special
       ``SwiftUI/View/alert(store:)`` view modifier that is tuned specifically for 
       ``ComposableArchitecture/Store``s.
+      
+      알림을 `ContactsFeature`에 통합하고 모든 로직을 구현하는 데 필요한 전부입니다. 
+      다음으로 알림을 뷰에 통합해야 합니다. 라이브러리에는 
+      ``ComposableArchitecture/Store``에 맞게 조정된 특별한 ``SwiftUI/View/alert(store:)`` 뷰 수정자가 포함되어 있습니다.
       
       @Step {
         Add the ``SwiftUI/View/alert(_:)`` view modifier to the `ContactsView`, and hand it a
         store that is scoped to the alert domain.
         
+        `ContactsView`에 ``SwiftUI/View/alert(_:)`` 뷰 수정자를 추가하고, 
+        알림 도메인에 맞게 스코프된 스토어를 전달합니다.
+        
         > Note: In order for the `$store.scope` syntax to work you must hold onto the store in the
         > view using the `@Bindable` property wrapper, or `@Perception.Bindable` if you are
         > targeting older platforms.
+        
+        > 참고: `$store.scope` 구문이 작동하려면 뷰에서 `@Bindable` 속성 래퍼를 사용하여 
+        > 스토어를 보유해야 하며, 이전 플랫폼을 대상으로 하는 경우 `@Perception.Bindable`을 사용할 수 있습니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0006.swift, previousFile: 02-02-01-code-0006-previous.swift)
       }
@@ -88,6 +133,8 @@
         Add a button to each row of the contacts list in order to send the `deleteButtonTapped`
         action to the store.
         
+        연락처 목록의 각 행에 버튼을 추가하여 `deleteButtonTapped` 액션을 스토어로 전송합니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-01-code-0007.swift)
       }
       
@@ -95,11 +142,16 @@
         Run the app in the preview to see that deletion works as expected. After tapping the trash
         icon, an alert shows, and if you confirm deletion the item is removed from the list.
         
-        @Video(source: "ch02-sub02-sec01-0000")
+        미리보기에서 앱을 실행하여 삭제가 예상대로 작동하는지 확인합니다. 
+        휴지통 아이콘을 탭한 후 알림이 표시되고, 삭제를 확인하면 항목이 목록에서 제거됩니다.
+        
+        @Video(source: "ch02-sub02-sec01-0000") 
       }
       
       We've now added a new feature, that of deleting a contact, but unfortunately our domain
       is not modeled as concisely as it could be.
+      
+      이제 연락처 삭제 기능을 추가했지만, 불행히도 우리의 도메인은 더 간결하게 모델링되지 않았습니다.
     }
   }
   
@@ -110,13 +162,24 @@
       destinations at once. However, that currently is possible since we are representing each of
       those destinations as optional pieces of ``ComposableArchitecture/Presents()``.
       
+      현재 `ContactsFeature`는 두 개의 가능한 목적지로 이동할 수 있습니다: "연락처 추가" 시트 또는 삭제 알림입니다. 
+      중요하게도 두 목적지로 동시에 이동하는 것은 불가능합니다. 그러나 현재는 각 목적지를 
+      선택적 ``ComposableArchitecture/Presents()``의 조각으로 표현하고 있기 때문에 가능합니다.
+      
       The number of invalid states explodes exponentially when you use optionals to represent
       features you can navigate to. For example, 2 optionals has 1 invalid state, but 3 optionals
       has 4 invalid states, and 4 optionals has 11 invalid states. This imprecise domain modeling
       leaks complexity into your application since you can never truly know which feature is being
       presented.
       
+      기능을 탐색할 수 있도록 표현하기 위해 선택적 값을 사용할 때 유효하지 않은 상태의 수가 기하급수적으로 증가합니다. 
+      예를 들어, 2개의 선택적 값은 1개의 유효하지 않은 상태를 가지지만, 3개의 선택적 값은 4개의 유효하지 않은 상태를 가지며, 
+      4개의 선택적 값은 11개의 유효하지 않은 상태를 가집니다. 이러한 부정확한 도메인 모델링은 
+      애플리케이션에 복잡성을 유출시킵니다. 왜냐하면 어떤 feature가 표시되고 있는지 진정으로 알 수 없기 때문입니다.
+      
       Let's see how to more concisely model our domains for navigating to multiple destinations.
+      
+      여러 목적지로 탐색하기 위해 도메인을 더 간결하게 모델링하는 방법을 살펴보겠습니다.
     }
     
     @Steps {
@@ -125,14 +188,22 @@
         reducer will hold the domain and logic for every feature that can be navigated to from
         the contacts feature, and as such it will be an enum.
         
+        `ContactsFeature` 내부에 중첩된 새로운 리듀서 `Destination`을 정의합니다. 
+        이 리듀서는 연락처 feature에서 탐색할 수 있는 모든 feature의 도메인과 로직을 보유하며, 
+        따라서 열거형이 될 것입니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0000.swift)
       }
       
       @Step {
-        Add a case for for the "Add contact" feature. Note that we are holding onto the actual
+        Add a case for the "Add contact" feature. Note that we are holding onto the actual
         `AddContactFeature` reducer in the case, not the state. The
         ``ComposableArchitecture/Reducer()`` macro will fill in all the requirements for the reducer
         protocol for us automatically.
+        
+        "연락처 추가" feature에 대한 케이스를 추가합니다. 
+        이 케이스에서는 상태가 아닌 실제 `AddContactFeature` 리듀서를 보유하고 있습니다. 
+        ``ComposableArchitecture/Reducer()``는 리듀서 프로토콜의 모든 요구 사항을 자동으로 채워줍니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0001.swift)
       }
@@ -140,6 +211,8 @@
       @Step {
         Add another case to the `Destination` for the alert state that can be displayed in the
         feature.
+        
+        기능에서 표시될 수 있는 알림 상태에 대한 `Destination`에 또 다른 케이스를 추가합니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0002.swift)
       }
@@ -149,9 +222,17 @@
       being written for you. And if in the future this feature can navigate to another feature,
       you will only have to add a single case to the `Destination` enum.
       
+      여러 개의 상호 배타적인 리듀서를 결합하는 단일 리듀서를 정의하는 데 필요한 전부입니다. 
+      Xcode에서 매크로 코드를 확장하여 작성된 모든 코드를 확인할 수 있습니다. 
+      그리고 미래에 이 feature가 다른 feature로 탐색할 수 있게 된다면, 
+      `Destination` 열거형에 단일 케이스만 추가하면 됩니다.
+      
       @Step {
         Replace the two pieces of optional ``ComposableArchitecture/Presents()`` with a single
         optional pointed at `Destination.State`.
+        
+        두 개의 선택적 ``ComposableArchitecture/Presents()``를 `Destination.State`를 가리키는 
+        단일 선택적으로 교체합니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0003.swift, previousFile: 02-02-02-code-0003-previous.swift)
       }
@@ -160,8 +241,14 @@
       is no longer `Equatable`. This is happening because `Destination.State` is not `Equatable`,
       and that type is generated by the [`@Reducer`](<doc:ComposableArchitecture/Reducer()>) macro.
       
+      이제 이것은 `ContactsFeature.State`가 더 이상 `Equatable`이 아님을 알려주는 컴파일 오류를 생성합니다. 
+      이는 `Destination.State`가 `Equatable`이 아니기 때문에 발생하며, 
+      해당 타입은 [`@Reducer`](<doc:ComposableArchitecture/Reducer()>) 매크로에 의해 생성됩니다.
+      
       @Step {
         Extend the macro-generated `Destination.State` to apply an `Equatable` conformance.
+        
+        매크로로 생성된 `Destination.State`를 확장하여 `Equatable` 적합성을 적용합니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0004.swift, previousFile: 02-02-02-code-0004-previous.swift)
       }
@@ -170,6 +257,9 @@
         Replace the two action cases that held onto ``ComposableArchitecture/PresentationAction``
         with a single case that holds onto `Destination.Action`.
         
+        ``ComposableArchitecture/PresentationAction``을 보유하고 있던 두 액션 케이스를 
+        `Destination.Action`을 보유하는 단일 케이스로 교체합니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0005.swift, previousFile: 02-02-02-code-0005-previous.swift)
       }
       
@@ -177,9 +267,15 @@
       one destination can be active at a time. But, also now have a lot of compiler errors we need
       to fix.
       
+      이제 우리의 모델이 더 간결하게 정의되었으며, 한 번에 하나의 목적지만 활성화될 수 있다는 
+      컴파일 타임 보장을 갖게 되었습니다. 그러나 이제 수정해야 할 많은 컴파일 오류가 발생합니다.
+      
       @Step {
         Instead of populating a piece of `addContact` optional state in order to drive navigation
         to that feature, we will now mutate `destination` to point it to the `addContact` case.
+        
+        `addContact` 선택적 상태를 채워 해당 기능으로의 탐색을 구동하는 대신, 
+        이제 `destination`을 `addContact` 케이스를 가리키도록 변경합니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0006.swift)
       }
@@ -189,11 +285,16 @@
         `.destination(.presented(_))` case, such as when the "Add Contact" feature tells us to 
         save the contact.
         
+        자식 도메인에서 발생하는 액션을 수신할 때 이제 `.destination(.presented(_))` 케이스를 
+        구조 분해해야 합니다. 예를 들어 "연락처 추가" 기능이 연락처를 저장하라고 알려줄 때 그렇습니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0007.swift)
       }
       
       @Step {
         And when the alert confirms deletion of the contact.
+        
+        그리고 알림이 연락처 삭제를 확인할 때.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0008.swift)
       }
@@ -202,12 +303,18 @@
         We can handle all other destination actions by simply returning a `.none` effect to 
         represent there is no other work to perform.
         
+        다른 모든 목적지 액션은 단순히 `.none` 이팩트를 반환하여 
+        수행할 다른 작업이 없음을 나타냅니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0009.swift)
       }
       
       @Step {
         Update the state mutation for showing an alert to instead point the `destination` to the
         `alert` case.
+        
+        알림을 표시하기 위한 상태 변경을 업데이트하여 `destination`을 
+        `alert` 케이스를 가리키도록 변경합니다.
         
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0010.swift)
       }
@@ -218,6 +325,10 @@
         `Destination` type in this expression because it can be inferred from how the ``Reducer()``
         macro was applied to the `Destination` enum.
         
+        리듀서 하단에서 사용된 두 개의 `ifLet`을 `Destination` 도메인에 집중하는 단일 `ifLet`으로 교체합니다. 
+        이 표현에서 `Destination` 타입을 명시할 필요는 없습니다. 
+        이는 ``Reducer()`` 매크로가 `Destination` 열거형에 어떻게 적용되었는지로부터 유추할 수 있기 때문입니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0011.swift)
       }
       
@@ -226,6 +337,10 @@
       All that is left is to update the view so that we can specify which case of the destination
       enum drives the sheet and alert.
       
+      두 개의 독립적이고 부정확하게 모델링된 선택적 값을 단일 선택적 열거형으로 변환하는 데 필요한 전부입니다. 
+      이제 한 번에 하나의 목적지만 활성화될 수 있다는 것을 증명할 수 있습니다. 
+      남은 것은 뷰를 업데이트하여 어떤 목적지 열거형 케이스가 시트와 알림을 구동하는지 지정할 수 있도록 하는 것입니다.
+      
       @Step {
         When you model all of your destinations in a single optional value, you start by scoping to
         the destination domain and then you further scope into the state and action cases
@@ -233,18 +348,29 @@
         can be done with familiar dot syntax because the 
         ``ComposableArchitecture/Reducer()`` macro applies the `@CasePathable` macro to each enum.
         
+        모든 목적지를 단일 선택적 값으로 모델링할 때, 
+        목적지 도메인에 스코프를 설정한 다음 특정 목적지와 관련된 상태 및 액션 케이스로 
+        친숙한 키 경로 점 체이닝 구문을 사용하여 추가로 스코프를 설정합니다. 
+        이는 ``ComposableArchitecture/Reducer()`` 매크로가 각 열거형에 `@CasePathable` 매크로를 적용하기 때문에 
+        친숙한 점 구문으로 수행할 수 있습니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0012.swift, previousFile: 02-02-02-code-0012-previous.swift)
       }
 
       @Step {
         The same can be done for the `alert` view modifier.
         
+        `alert` 뷰 수정자에 대해서도 동일하게 수행할 수 있습니다.
+        
         @Code(name: "ContactsFeatures.swift", file: 02-02-02-code-0013.swift)
       }
 
       That completes the refactor of the reducer and view to use a single piece of optional enum
-      state instead using multiple optional values. The application works exactly as it did before,
+      state instead of using multiple optional values. The application works exactly as it did before,
       but now its domain is more concisely modeled.
+      
+      이제 리듀서와 뷰를 리팩토링하여 여러 개의 선택적 값을 사용하는 대신 단일 선택적 열거형 상태를 사용하도록 
+      완료했습니다. 애플리케이션은 이전과 정확히 동일하게 작동하지만, 이제 도메인이 더 간결하게 모델링되었습니다.
     }
   }
 }
