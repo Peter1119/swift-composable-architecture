@@ -2,6 +2,9 @@
   @Intro(title: "Testing your feature") {
     Learn how to write test for the counter built in previous tutorials, including how to assert 
     against state changes and how effects execute and feed data back into the system.
+    
+    이전 튜토리얼에서 만든 카운터의 테스트 코드를 작성하는 방법을 배워봅니다. 상태 변화를 검증하고 
+    효과가 어떻게 실행되어 시스템에 데이터를 다시 전달하는지 알아봅니다.
   }
       
   @Section(title: "Testing state changes") {
@@ -10,15 +13,27 @@
       the reducer, and that comes down to testing two things: how state mutates when actions are
       sent, and how effects are executed and feed their data back into the reducer.
       
+      Composable Architecture로 만든 기능에서 테스트가 필요한 유일한 것은 리듀서입니다.
+      이는 두 가지를 테스트하는 것으로 나뉩니다: 액션이 전송될 때 상태가 어떻게 변하는지와
+      이팩트가 어떻게 실행되어 리듀서로 데이터를 다시 전달하는지입니다.
+      
       State changes are by far the easiest part to test in the Composable Architecture since 
       reducers form a pure function. All you need to do is feed a piece of state and an action to 
       the reducer and then assert on how the state changed.
+      
+      상태 변화는 리듀서가 순수 함수이기 때문에 Composable Architecture에서 테스트하기 가장 쉬운 부분입니다.
+      리듀서에 상태와 액션을 전달한 다음 상태가 어떻게 변했는지 검증하기만 하면 됩니다.
       
       But, the Composable Architecture makes an easy process even easier thanks to the 
       ``ComposableArchitecture/TestStore``. The test store is a testable runtime for your feature 
       that monitors everything happening inside the system as you send actions, making it possible 
       for you to write simple assertions, and when your assertion fails it provides a nicely 
       formatted failure message.
+      
+      하지만 Composable Architecture는 ``ComposableArchitecture/TestStore`` 덕분에 이 쉬운 과정을 더욱 쉽게 만듭니다.
+      TestStore는 기능을 테스트할 수 있는 실행 환경으로, 액션을 보낼 때 시스템 내부에서 
+      일어나는 모든 것을 모니터링합니다. 이를 통해 간단한 검증을 작성할 수 있고,
+      검증이 실패할 경우 잘 정리된 실패 메시지를 제공합니다.
     }
     
     @Steps {
@@ -27,9 +42,36 @@
         feature. We will start by creating a CounterFeatureTests.swift file with some basic 
         scaffolding in place for the test.
         
+        Counter Feature의 아주 간단한 증가와 감소 동작에 대한 테스트를 작성해보겠습니다. 
+        CounterFeatureTests.swift 파일을 생성하고 테스트를 위한 기본적인 구조를 만드는 것부터 시작하겠습니다.
+        
         > Note: We are going to preemptively make the test method `async` because the testing tools
         > of the Composable Architecture do make use of asynchrony, and we are going to make the
         > test suite `@MainActor` because the tools are main actor-isolated.
+        
+        > 참고: Composable Architecture의 테스트 도구들은 비동기를 사용하기 때문에 테스트 메서드를 미리 
+        > `async`로 만들 것이며, 도구들이 메인 액터에 격리되어 있기 때문에 테스트 스위트를 
+        > `@MainActor`로 만들 것입니다.
+
+        > 테스트 스위트(Test Suite): 여러 개의 테스트를 하나로 모아놓은 것을 말합니다. 
+        > 예를 들어 계산기 앱을 테스트한다면, 더하기/빼기/곱하기/나누기 각각의 테스트들을 
+        > "계산기 테스트 스위트"라는 하나의 그룹으로 묶어서 관리할 수 있습니다. 
+        > 이렇게 관련된 테스트들을 한 곳에 모아두면 테스트를 체계적으로 관리하고 실행하기가 
+        > 더 쉬워집니다.
+
+        > 메인 액터 격리(Main Actor Isolation)란 무엇인가요?
+        > 
+        > 메인 액터 격리는 Swift의 동시성 모델에서 중요한 개념입니다. 
+        > UI 관련 코드는 반드시 메인 스레드에서 실행되어야 하는데, 메인 액터 격리는 
+        > 이를 컴파일 타임에 보장하는 방법을 제공합니다.
+        > 
+        > `@MainActor`로 표시된 코드는:
+        > - 자동으로 메인 스레드에서 실행됩니다
+        > - 다른 스레드에서 실행되는 것을 방지합니다
+        > - UI 업데이트와 관련된 코드의 안전성을 보장합니다
+        > 
+        > 테스트에서 `@MainActor`를 사용하는 이유는 테스트하는 동안 UI 관련 작업이
+        > 올바른 스레드(메인 스레드)에서 실행되도록 보장하기 위함입니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-01-code-0001.swift)
       }
@@ -41,12 +83,20 @@
         ``ComposableArchitecture/Store``, by providing some initial state to start the feature in
         and providing a trailing closure to describe the reducer that will be powering the feature.
         
+        다음으로, ``ComposableArchitecture/TestStore``를 생성할 것입니다. 이는 액션이 시스템에 전송될 때 
+        기능의 동작이 어떻게 변하는지 쉽게 검증할 수 있게 해주는 도구입니다. 테스트 스토어는 
+        ``ComposableArchitecture/Store``를 생성하는 것과 같은 방식으로 생성합니다. 기능의 초기 상태를 
+        제공하고, 기능을 구동할 리듀서를 설명하는 후행 클로저를 제공하면 됩니다.
+
         @Code(name: "CounterFeatureTests.swift", file: 01-03-01-code-0002.swift)
       }
       
       @Step {
         ``ComposableArchitecture/TestStore`` requires equatable state in order to make its
         assertions, so we must add a conformance.
+        
+        ``ComposableArchitecture/TestStore``는 검증을 위해 상태가 Equatable을 준수해야 합니다.
+        따라서 conformance를 추가해야 합니다.
         
         @Code(name: "CounterFeature.swift", file: 01-03-01-code-0003.swift, previousFile: 01-03-01-code-0003-previous.swift)
       }
@@ -56,9 +106,17 @@
         doing. For example, we can emulate tapping the increment button and then the decrement 
         button.
         
+        이제 사용자의 동작을 흉내내기 위해 store에 액션을 보내기 시작할 수 있습니다.
+        예를 들어, increment 버튼을 탭하고 decrement 버튼을 탭하는 것을 흉내낼 수 있습니다.
+        
         > Note: The ``ComposableArchitecture/TestStore/send(_:assert:fileID:file:line:column:)-8f2pl`` method on
         the test store is async because most features involve asynchronous side effects, and the
         test store uses the async context to track those effects.
+        
+        > 참고: 대부분의 기능이 비동기 사이드 이팩트를 포함하고 있고, test store가 이러한 이팩트들을 
+        > 추적하기 위해 async 컨텍스트를 사용하기 때문에 test store의 
+        > ``ComposableArchitecture/TestStore/send(_:assert:fileID:file:line:column:)-8f2pl`` 메서드는 
+        > async입니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-01-code-0004.swift, previousFile: file: 01-03-01-code-0002.swift)
       }
@@ -71,6 +129,12 @@
         failure message showing you exactly how state differed from what you expected (the lines
         with the minus "-") and the actual value (the lines with the plus "+").
         
+        cmd+U를 입력하거나 테스트 메서드 옆의 다이아몬드를 클릭하여 테스트를 실행합니다.
+        안타깝게도 테스트가 실패하는 것을 볼 수 있습니다. 이는 ``ComposableArchitecture/TestStore``에 
+        액션을 보낼 때마다 해당 액션이 전송된 후 상태가 어떻게 변하는지 정확히 설명해야 하기 때문입니다. 
+        라이브러리는 상태가 예상한 값(마이너스 "-" 표시가 있는 줄)과 실제 값(플러스 "+" 표시가 있는 줄)과 
+        어떻게 다른지 자세히 보여주는 실패 메시지를 제공합니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-01-code-0005.swift)
       }
       
@@ -81,10 +145,19 @@
         was sent, and it's your job to mutate `$0` so that it equals the state _after_ the action is
         sent.
         
+        테스트 실패를 해결하기 위해서는 각 액션을 보낸 후 상태가 어떻게 변했는지 검증해야 하며,
+        test store는 이를 매우 인체공학적으로 만들어줍니다. `send` 메서드에 후행 클로저만 제공하면 되는데,
+        이 클로저는 액션이 전송되기 _전_ 상태의 변경 가능한 버전을 받습니다. 그리고 액션이 전송된 _후_의 
+        상태와 동일하도록 `$0`을 변경하는 것이 여러분의 역할입니다.
+        
         > Tip: Prefer to use "absolute" mutations, such as `count = 1`, rather than "relative" 
         mutations, such as `count += 1`. The former is a stronger assertion that proves you
         know the exact state your feature is in rather than merely what transformation was applied
         to your state.
+        
+        > 팁: `count += 1`과 같은 "상대적인" 변경보다는 `count = 1`과 같은 "절대적인" 변경을 
+        > 사용하는 것이 좋습니다. 후자가 단순히 상태에 어떤 변환이 적용되었는지가 아니라 
+        > 기능이 정확히 어떤 상태에 있는지 알고 있다는 것을 증명하는 더 강력한 검증이 됩니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-01-code-0006.swift)
       }
@@ -94,6 +167,12 @@
       feature. In more real world features the logic will be a lot more complex and you will have 
       to do more work to assert on how state changes. But luckily doing so can be ergonomic and 
       test failure messages are user-friendly thanks to the test store.
+      
+      이제 테스트가 통과되어 증가와 감소 로직이 예상대로 작동한다는 것이 증명되었습니다. 
+      하지만 증가와 감소 로직은 우리 기능에서 가장 단순한 것들 중 하나입니다. 실제 기능에서는 
+      로직이 훨씬 더 복잡할 것이고 상태 변화를 검증하기 위해 더 많은 작업을 해야 할 것입니다. 
+      하지만 다행히도 test store 덕분에 이러한 작업이 인체공학적이며 테스트 실패 메시지도 
+      사용자 친화적입니다.
     }
   }
   
@@ -108,12 +187,23 @@
       dependencies for tests. Let's start by testing the timer functionality of our feature, 
       which turns out to be a little easier to test than the network request for fetching a number
       fact.
+      
+      우리는 방금 리듀서의 가장 중요한 책임 중 하나인 액션을 처리할 때 상태를 어떻게 변경하는지 
+      테스트했습니다. 리듀서의 다음으로 중요한 책임은 store에 의해 처리되는 이팩트를 반환하는 것입니다.
+      
+      사이드 이팩트에 대한 테스트를 작성하는 것은 더 많은 작업이 필요합니다. 일반적으로 외부 시스템에 
+      대한 의존성을 제어하고 테스트를 위한 테스트 친화적인 버전의 의존성을 제공해야 하기 때문입니다. 
+      우리 기능의 타이머 기능부터 테스트를 시작해보겠습니다. 이는 숫자 정보를 가져오는 네트워크 요청보다 
+      테스트하기가 조금 더 쉽습니다.
     }
     
     @Steps {
       @Step {
         Let's get the scaffolding of a new test into place by creating a new async test method
         and constructing a ``ComposableArchitecture/TestStore``.
+        
+        새로운 async 테스트 메서드를 생성하고 ``ComposableArchitecture/TestStore``를 구성하여 
+        새로운 테스트를 위한 기본 구조를 만들어보겠습니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0001.swift, previousFile: 01-03-02-code-0001-previous.swift)
       }
@@ -124,13 +214,20 @@
         starting the timer by sending the `toggleTimerButtonTapped`, and we can even assert on
         how state changes since we know the `isTimerRunning` state should flip to `true`.
         
+        사용자가 타이머를 시작하고, 몇 초 동안 카운트가 올라가는 것을 확인한 다음, 타이머를 
+        중지하는 흐름을 테스트하려고 합니다. 이는 `toggleTimerButtonTapped`를 보내서 사용자가 
+        타이머를 시작하는 것을 흉내내면 됩니다. 그리고 `isTimerRunning` 상태가 `true`로 
+        바뀌어야 한다는 것을 알기 때문에 상태 변화도 검증할 수 있습니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0002.swift)
       }
       
       @Step {
         However, if we run this test we get a failure. It tells us that the test ended but that an
         effect was still running.
-          
+        
+        하지만 이 테스트를 실행하면 실패하는 것을 볼 수 있습니다. 테스트는 종료되었지만 이팩트가 아직 
+        실행 중이라고 알려줍니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0003.swift)
       }
@@ -143,11 +240,22 @@
       your state mutations from those actions had bugs. So, this is a very good failure to have, 
       and is one of the many ways the Composable Architecture can help us catch problems in our 
       code.
+
+      이는 ``ComposableArchitecture/TestStore``가 이팩트를 포함해서 시간이 지나면서 기능이 어떻게 
+      변화하는지 모두 확인하도록 되어 있어서 생기는 실패입니다. 이 경우 test store는 
+      테스트가 끝나기 전에 테스트 중에 시작된 모든 이팩트가 반드시 완료되어야 한다고 요구합니다. 
+      이렇게 하면 예상하지 못한 이팩트가 실행되고 있거나 시스템에 예상치 못한 액션을 보내는 경우, 
+      또는 그 액션들로 인한 상태 변경에 버그가 있는 경우와 같은 문제들을 발견하는 데 도움이 됩니다. 
+      그래서 이런 실패는 매우 유용하며, Composable Architecture가 우리 코드의 문제를 찾아내는 데 
+      도움이 되는 여러 방법 중 하나입니다.
       
       @Step {
         To get the test to pass we simply have to emulate the user toggling the timer again by
         sending the `toggleTimerButtonTapped` action.
-        
+
+        테스트를 통과시키기 위해서는 단순히 사용자가 타이머를 다시 토글하는 것을 흉내내어 
+        `toggleTimerButtonTapped` 액션을 보내면 됩니다.
+
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0004.swift)
       }
       
@@ -157,20 +265,32 @@
       ``ComposableArchitecture/TestStore/receive(_:timeout:assert:fileID:file:line:column:)-53wic`` method on
       test store to assert that you expect to receive an action, and describe how state mutates
       upon receiving that action.
+
+      이 테스트는 통과하지만 타이머 동작에 대해서는 아무것도 검증하지 않습니다. 일정 시간이 지난 후 
+      `timerTick` 액션이 시스템으로 전송되어 `count`가 증가하는지 검증하고 싶습니다. 이는 test store의 
+      ``ComposableArchitecture/TestStore/receive(_:timeout:assert:fileID:file:line:column:)-53wic`` 
+      메서드를 사용하여 액션을 수신할 것으로 예상하고, 해당 액션을 수신할 때 상태가 어떻게 변하는지 
+      설명할 수 있습니다.
       
       @Step {
         Add a new assertion that shows you expect to receive a `timerTick` action and that the
         `count` state increases to 1.
-                
+        
+        `timerTick` 액션을 수신할 것으로 예상하고 `count` 상태가 1 증가하는지 보여주는 새로운 검증을 추가합니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0005.swift)
         
         > Note: We use key path syntax for singling out the case of the `Action` enum we expect
         to receive from the effect.
+        
+        > 참고: 이팩트로부터 수신할 것으로 예상되는 `Action` 열거형의 경우를 구분하기 위해 키 경로 문법을 사용합니다.
       }
       
       @Step {
         If you run the test now you may find that sometimes it passes, albeit taking over a second 
-        to run, or sometimes it fails. 
+        to run, or sometimes it fails.
+        
+        이제 테스트를 실행하면, 실행하는 데 1초 이상 걸리지만 가끔 통과하거나 가끔 실패하는 것을 알 수 있습니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0006.swift)
       }
@@ -181,11 +301,19 @@
       want your tests to be slow, and so it would rather you take control over your dependency on time to
       write a faster, more deterministic test.
       
+      이는 타이머가 액션을 방출하는 데 1초가 걸리지만, test store는 액션을 수신하기 위해 일정 시간만 기다리기 때문에 발생합니다. 
+      기다리지 않으면 테스트 실패가 발생합니다. 이는 test store가 테스트가 느려지는 것을 원하지 않기 때문이며, 
+      시간에 대한 의존성을 제어하여 더 빠르고 결정적인 테스트를 작성하기를 원하기 때문입니다.
+      
       @Step {
         One thing we can do to force the ``ComposableArchitecture/TestStore`` to wait for more time
         to receive the action is to use the `timeout` parameter of `receive`. We need to make it
         wait more than 1 second because `Task.sleep` is not an exact tool, but with the explicit 
         timeout the test now passes.
+        
+        ``ComposableArchitecture/TestStore``가 액션을 수신하기 위해 더 오래 기다리도록 강제할 수 있는 방법 중 하나는 
+        `receive`의 `timeout` 매개변수를 사용하는 것입니다. `Task.sleep`은 정확한 도구가 아니기 때문에 
+        1초 이상 기다리도록 해야 하지만, 명시적인 타임아웃을 사용하면 이제 테스트가 통과합니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0007.swift)
       }
@@ -195,20 +323,35 @@
       to tick only every 10 seconds. Would we really want to hold up our test suite for 10 seconds
       while we wait for the tick?
       
+      그러나 이제 테스트를 실행하는 데 1초 이상이 걸립니다. 타이머 틱에 대해 몇 가지 더 검증하고 싶다면 
+      더 많은 시간을 기다려야 할 것입니다. 또는 타이머를 10초마다 한 번씩만 틱하도록 변경하고 싶다면, 
+      틱을 기다리면서 테스트 스위트를 10초 동안 멈추고 싶을까요?
+      
       The fix is to not reach out to the global, uncontrollable `Task.sleep` function, which forces
       our test suite to wait around for real time to pass in order to get ticks from the timer.
       Instead we need to make our feature use a Swift `Clock`, which allows us to provide a 
       `ContinuousClock` when run in simulators and devices, but in tests we can use a controllable
       clock, such as a test clock.
       
+      해결책은 전역적이고 제어할 수 없는 `Task.sleep` 함수를 사용하지 않는 것입니다. 이는 타이머로부터 
+      틱을 얻기 위해 실제 시간이 지나기를 기다리도록 테스트 스위트를 강제합니다. 대신, 기능이 Swift `Clock`을 
+      사용하도록 만들어야 합니다. 이를 통해 시뮬레이터와 장치에서 실행할 때는 `ContinuousClock`을 제공할 수 있지만, 
+      테스트에서는 테스트 clock과 같은 제어 가능한 clock을 사용할 수 있습니다.
+      
       Luckily the Composable Architecture comes with a dependency management system (see 
       <doc:DependencyManagement> for more information), and even comes with a controllable clock
       out of the box.
+      
+      다행히도 Composable Architecture는 의존성 관리 시스템을 제공하며 (자세한 내용은 <doc:DependencyManagement>를 참조하세요), 
+      기본적으로 제어 가능한 clock도 제공합니다.
       
       @Step {
         Go back to CounterFeature.swift and add a dependency on a continuous clock to the reducer.
         And then, in the implementation of `reduce`, do not reach out to `Task.sleep` and instead 
         use the `clock` the feature depends on.
+        
+        CounterFeature.swift로 돌아가서 리듀서에 continuous clock에 대한 의존성을 추가합니다.
+        그런 다음, `reduce` 구현에서 `Task.sleep`을 사용하지 말고 기능이 의존하는 `clock`을 사용합니다.
         
         @Code(name: "CounterFeature.swift", file: 01-03-02-code-0008.swift, previousFile: 01-02-03-code-0006.swift)
       }
@@ -216,9 +359,13 @@
       With that little bit of upfront work to control the dependency on time-based asynchrony
       we can now write a very simple test that passes deterministically and immediately.
       
+      시간 기반 비동기에 대한 의존성을 제어하기 위한 약간의 사전 작업을 통해 이제 예측 가능하고 즉시 통과하는 매우 간단한 테스트를 작성할 수 있습니다.
+      
       @Step {
         Go back to CounterFeatureTests.swift so that we can make some changes where we explicitly
         provide a controllable clock to use for tests.
+        
+        CounterFeatureTests.swift로 돌아가서 테스트에 사용할 수 있는 제어 가능한 clock을 명시적으로 제공할 수 있도록 몇 가지 변경을 합니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-02-code-0009.swift)
       }
@@ -230,8 +377,15 @@
         and it allows you to override any dependency you want. And then finally, before receiving
         the `timerTick` action we will tell the test clock to advance by 1 second.
         
+        `testTimer` 메서드의 상단에 `TestClock`을 구성합니다. 이것은 우리가 시간 제어를 위해 기능의 리듀서에서 사용하고자 하는 clock입니다.
+         이를 위해 ``ComposableArchitecture/TestStore``에 `withDependencies`라는 또 다른 후행 클로저를 제공하며, 
+         이를 통해 원하는 모든 의존성을 재정의할 수 있습니다. 
+         그리고 마지막으로, `timerTick` 액션을 수신하기 전에 test clock에 1초 앞으로 진행하도록 지시합니다.
+        
         > Note: The `TestClock` type comes from our [swift-clocks][swift-clocks] open source 
         library, which provides a number of useful clock implementations and tools.
+        
+        > 참고: `TestClock` 타입은 여러 유용한 clock 구현과 도구를 제공하는 [swift-clocks][swift-clocks] 오픈 소스 라이브러리에서 제공됩니다.
         
         [swift-clocks]: https://github.com/pointfreeco/swift-clocks
         
@@ -242,10 +396,17 @@
       of the time. By taking control of our dependency we do not have to worry about slowing down
       our test suite or being afraid that we didn't provide a big enough timeout in `receive`.
       
+      이제 이 테스트는 즉시 통과하며, 매번 실행할 때마다 항상 같은 결과가 나올 것이라고 확신할 수 있습니다.
+      의존성을 제어함으로써 테스트 스위트가 느려지거나 `receive`에서 충분히 큰 타임아웃을 제공하지 않았을까 걱정할 필요가 없습니다.
+      
       But, while this is all looking really good so far, our feature still has another bit of 
       behavior that we do not have any test coverage on, and it involves another side effect. That
       is the behavior that loads a fact for a number, and it uses a network request to load that
       data.
+
+      하지만, 지금까지는 모든 것이 정말 괜찮아 보이지만, 우리의 기능에는 아직 테스트 커버리지가 없는 또 다른 동작이 있으며, 
+      이는 또 다른 사이드 이펙트와 관련이 있습니다. 이는 숫자에 대한 정보를 로드하는 동작이며, 
+      해당 데이터를 로드하기 위해 네트워크 요청을 사용합니다.
     }
   }
   
@@ -257,7 +418,14 @@
       or the server's, and there's no way to predict what kind of data will be sent back from the 
       server.
       
+      네트워크 요청은 아마도 애플리케이션에서 가장 일반적인 종류의 사이드 이팩트일 것입니다. 
+      왜냐하면 대부분의 경우 외부 서버가 사용자의 데이터를 보유하고 있기 때문입니다. 
+      네트워크 요청을 수행하는 기능을 테스트하는 것은 요청이 느릴 수 있고, 네트워크 연결 상태나 서버에 의존할 수 있으며, 
+      서버에서 어떤 종류의 데이터가 반환될지 예측할 수 없기 때문에 어려울 수 있습니다.
+
       Let's try writing a test for the number fact behavior in a naive way, and see what goes wrong.
+
+      네트워크 요청을 수행하는 기능을 테스트하는 단순한 방법을 시도해보고, 어떤 문제가 발생하는지 살펴보겠습니다.
     }
     
     @Steps {
@@ -266,15 +434,24 @@
         Also go ahead and get some scaffolding into place for the 
         ``ComposableArchitecture/TestStore``.
         
+        CounterFeatureTests.swift에 숫자 정보 동작을 테스트하기 위한 새로운 테스트 메서드를 추가합니다.
+        또한 ``ComposableArchitecture/TestStore``를 위한 기본 구조를 설정합니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-03-code-0001.swift, previousFile: 01-03-03-code-0001-previous.swift)
       }
       
       For the test we want to emulate the flow of the user tapping the fact button, seeing the 
       progress indicator, and then some time later the fact is fed back into the system.
       
+      테스트에서는 사용자가 정보 버튼을 탭하고, progress indicator를 본 다음, 
+      일정 시간이 지난 후 정보가 시스템에 다시 전달되는 흐름을 흉내내고자 합니다.
+      
       @Step {
         Emulate the user tapping the button by sending the `factButtonTapped` action, and we can 
         already assert that `isLoading` must flip to `true`.
+        
+        `factButtonTapped` 액션을 보내서 사용자가 버튼을 탭하는 것을 흉내내고, 
+        `isLoading`이 `true`로 바뀌어야 한다는 것을 이미 검증할 수 있습니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-03-code-0002.swift)
       }
@@ -285,6 +462,11 @@
         us to assert on how all effects execute, and since the network request has not yet finished
         we are getting a failure.
         
+        안타깝게도, 테스트를 실행하면 실패하는 것을 볼 수 있습니다. 
+        이는 위에서 배운 테스트에 대한 내용에 비추어 볼 때 그리 놀라운 일이 아닙니다. 
+        ``ComposableArchitecture/TestStore``는 모든 이팩트가 어떻게 실행되는지를 검증하도록 강제하며,
+        네트워크 요청이 아직 완료되지 않았기 때문에 실패가 발생합니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-03-code-0003.swift)
       }
       
@@ -293,12 +475,17 @@
         `factResponse` action. But then the question is how do we assert on the fact returned from
         the server? Each time we ask for a fact from the server it may send us something different.
         
+        테스트를 수정하기 위해서는 네트워크 요청이 완료되고 `factResponse` 액션을 수신할 때까지 기다려야 합니다. 
+        그러나 그럼 질문은 서버로부터 반환된 정보를 어떻게 검증할 수 있을까요? 매번 서버에서 정보를 요청하면 다른 정보를 보낼 수 있습니다.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-03-code-0004.swift)
       }
       
       @Step {
         Run tests to see that the test fails because we receive a fact from the server we could not
         have possibly predicted.
+        
+        테스트를 실행하여 서버로부터 예측할 수 없는 정보를 수신했기 때문에 테스트가 실패하는 것을 확인합니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-03-code-0005.swift)
       }
@@ -307,6 +494,10 @@
       back a different fact each time. And even if we could predict the data sent back from the 
       server, it still would not be ideal because our tests will become slow and flakey since they
       require internet connectivity and uptime of an external server.
+      
+      여기서 우리가 보는 것은 이 동작을 테스트할 방법이 없다는 것입니다. 서버는 매번 다른 정보를 반환할 것입니다.
+      그리고 설령 서버에서 반환되는 데이터를 예측할 수 있다고 하더라도, 인터넷 연결과 외부 서버의 가동 시간이 필요하기 때문에
+      테스트가 느려지고 불안정해질 것입니다.
     }
   }
   
@@ -315,10 +506,16 @@
       Now we see the problem with using uncontrolled dependencies in our feature code. It makes our
       code hard to test, and can make tests take a long time to run or become flakey.
       
+      이제 우리는 기능 코드에서 제어되지 않는 의존성을 사용하는 문제를 보았습니다. 이는 코드를 테스트하기 어렵게 만들고,
+      테스트가 실행되는 데 오랜 시간이 걸리거나 불안정해질 수 있습니다.
+      
       For these reasons, and more, it is highly encouraged for you to control your dependency on
       external systems (see <doc:DependencyManagement> for more information). The Composable 
       Architecture comes with a complete set of tools for controlling and propagating dependencies
       throughout an application.
+      
+      이러한 이유로, 외부 시스템에 대한 의존성을 제어하는 것이 매우 권장됩니다 (자세한 내용은 <doc:DependencyManagement>를 참조하세요).
+      Composable Architecture는 애플리케이션 전반에 걸쳐 의존성을 제어하고 전파하기 위한 완전한 도구 세트를 제공합니다.
     }
     
     @Steps {
@@ -326,6 +523,9 @@
         Start by creating a new file, NumberFactClient.swift, and import the Composable 
         Architecture. This will give you access to the tools necessary to control any dependency
         in your feature.
+        
+        NumberFactClient.swift라는 새 파일을 만들고 Composable Architecture를 가져옵니다.
+        이를 통해 기능에서 필요한 모든 의존성을 제어하는 데 필요한 도구에 접근할 수 있습니다.
         
         @Code(name: "NumberFactClient.swift", file: 01-03-04-code-0001.swift)
       }
@@ -336,12 +536,22 @@
         a string. This will allow you to use a "live" version of the dependency when running your
         feature in simulators and devices, but you can use a more controlled version during tests.
         
+        의존성을 제어하는 첫 번째 단계는 의존성을 추상화하는 인터페이스를 모델링하는 것입니다.
+        이 경우, 정수를 받아 문자열을 반환하는 단일 비동기, 예외 발생 가능 엔드포인트입니다.
+        이를 통해 시뮬레이터와 장치에서 기능을 실행할 때 "실시간" 버전의 의존성을 사용할 수 있지만,
+        테스트 중에는 더 제어된 버전을 사용할 수 있습니다.
+        
         > Tip: While protocols are by far the most popular way of abstracting dependency interfaces,
         > they are not the only way. We prefer to use structs with mutable properties to represent
         > the interface, and then construct values of the struct to represent conformances. You can
         > use protocols for your dependencies if you so wish, but if you are interested in learning
         > more about the struct style, see our [series of videos][dependencies-collection] for more 
         > information.
+        
+        > 팁: 프로토콜은 의존성 인터페이스를 추상화하는 가장 인기 있는 방법이지만, 유일한 방법은 아닙니다.
+        > 우리는 인터페이스를 나타내기 위해 변경 가능한 속성을 가진 구조체를 사용하는 것을 선호하며,
+        > 그런 다음 구조체의 값을 생성하여 적합성을 나타냅니다. 원하신다면 의존성에 대해 프로토콜을 사용할 수 있지만,
+        > 구조체 스타일에 대해 더 알고 싶다면 [비디오 시리즈][dependencies-collection]를 참조하세요.
         
         [dependencies-collection]: https://www.pointfree.co/collections/dependencies
         
@@ -354,10 +564,18 @@
         `liveValue`. This is the value used when your feature is run in simulators and devices,
         and it's the place where it is appropriate to make live network requests.
         
+        다음으로, 라이브러리에 의존성을 등록해야 하며, 이는 두 단계가 필요합니다.
+        먼저 클라이언트를 `DependencyKey` 프로토콜에 적합하게 만들어야 하며, `liveValue`를 제공해야 합니다.
+        이는 기능이 시뮬레이터와 장치에서 실행될 때 사용되는 값이며, 실시간 네트워크 요청을 수행하기에 적합한 장소입니다.
+        
         > Note: Technically the dependency management system in the Composable Architecture is 
         > provided by another library of ours, [swift-dependencies][swift-dependencies]. We split
         > that library out of the Composable Architecture once it became clear that it could be
         > useful even in vanilla SwiftUI and UIKit applications.
+        
+        > 참고: 기술적으로 Composable Architecture의 의존성 관리 시스템은 우리의 또 다른 라이브러리인
+        > [swift-dependencies][swift-dependencies]에 의해 제공됩니다. 이 라이브러리는
+        > 기본 SwiftUI 및 UIKit 애플리케이션에서도 유용할 수 있다는 것이 명확해지자 Composable Architecture에서 분리되었습니다.
         
         [swift-dependencies]: https://github.com/pointfreeco/swift-dependencies
         
@@ -369,9 +587,16 @@
         property to `DependencyValues` with a getter and a setter. This is what allows for the
         syntax `@Dependency(\.numberFact)` in the reducer.
         
+        라이브러리에 의존성을 등록하는 두 번째 단계는 `DependencyValues`에 getter와 setter가 있는 계산된 속성을 추가하는 것입니다. 
+        이것이 리듀서에서 `@Dependency(\.numberFact)` 구문을 사용할 수 있게 해줍니다.
+        
         > Note: Registering a dependency with the library is not unlike registering an
         > environment value with SwiftUI, which requires conforming to `EnvironmentKey` to provide
         > a `defaultValue` value and extending `EnvironmentValues` to provide a computed property.
+
+        > 참고: 라이브러리에 의존성을 등록하는 것은 SwiftUI에 환경 값을 등록하는 것과 크게 다르지 않습니다.
+        > `defaultValue` 값을 제공하기 위해 `EnvironmentKey`를 준수하고 계산된 속성을 제공하기 위해 
+        > `EnvironmentValues`를 확장해야 합니다.
         
         @Code(name: "NumberFactClient.swift", file: 01-03-04-code-0004.swift)
       }
@@ -380,11 +605,19 @@
       little bit of upfront work you can start using the dependency in your features, and most
       importantly, start using test-friendly versions of the dependency in tests.
       
+      이것이 의존성 앞에 제어 가능한 인터페이스를 두는 데 필요한 전부입니다. 
+      이 약간의 사전 작업을 통해 기능에서 의존성을 사용하기 시작할 수 있으며, 가장 중요한 것은 
+      테스트에서 테스트 친화적인 버전의 의존성을 사용하기 시작할 수 있다는 것입니다.
+      
       @Step {
         Go back to CounterFeature.swift and add a new dependency using the `@Dependency` property
         wrapper, but this time for the number fact client. Then, in the effect returned from
         `factButtonTapped`, use the `numberFact` dependency to load the fact rather than reaching
         out to `URLSession` to make a live network request.
+        
+        CounterFeature.swift로 돌아가서 `@Dependency` 속성 래퍼를 사용하여 새로운 의존성을 추가합니다. 
+        이번에는 숫자 정보 클라이언트를 위해서입니다. 그런 다음, `factButtonTapped`에서 반환된 이팩트에서 
+        실시간 네트워크 요청을 위해 `URLSession`에 접근하는 대신 `numberFact` 의존성을 사용하여 정보를 로드합니다.
         
         @Code(name: "CounterFeature.swift", file: 01-03-04-code-0005.swift, previousFile: 01-03-02-code-0008.swift)
       }
@@ -394,8 +627,14 @@
       and deterministically, 100% of the time. But, before doing that let's show off a super
       power of the Composable Architecture.
       
+      기능에서 이 약간의 작업을 완료하면 이제 네트워크를 완전히 피하고, 즉시 그리고 결정론적으로 100% 통과하는 
+      이 동작에 대한 단위 테스트를 즉시 쉽게 작성할 수 있습니다. 하지만, 그 전에 Composable Architecture의 
+      강력한 기능을 보여드리겠습니다.
+      
       @Step {
         Without making any changes to the test, run the test in Xcode again.
+        
+        테스트에 아무런 변경을 가하지 않고, Xcode에서 테스트를 다시 실행합니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-04-code-0006.swift, previousFile: 01-03-04-code-0006-previous.swift)
       }
@@ -404,6 +643,10 @@
       a live dependency in our test without overriding it. This is a _fantastic_ failure to get
       because it notifies us whenever you may be accidentally making a network request, or writing
       something to disk, or tracking analytics, in a test when you don't mean to.
+      
+      테스트는 동일한 메시지로 실패하지만, 새로운 메시지가 있습니다. 이는 우리가 테스트에서 실시간 의존성을 
+      재정의하지 않고 사용하고 있음을 알려줍니다. 이는 네트워크 요청을 실수로 하거나, 디스크에 무언가를 쓰거나, 
+      분석을 추적하는 경우에 대해 알려주기 때문에 _훌륭한_ 실패입니다.
       
       We definitely do not want to make a live network request in our test, so let's fix it, and
       this will make our test pass immediately and deterministically, 100% of the time. We are going
@@ -417,12 +660,20 @@
         a hard coded string. Notice that there is no true async or request work being performed
         in the endpoint.
         
+        ``ComposableArchitecture/TestStore``의 의존성을 `withDependencies` 후행 클로저를 열어 재정의합니다. 
+        이 클로저는 현재 의존성을 나타내는 인수를 전달받으며, 원하는 대로 의존성을 변경할 수 있습니다. 
+        특히, `numberFact.fetch` 엔드포인트를 재정의하여 하드 코딩된 문자열을 즉시 반환하도록 할 것입니다. 
+        엔드포인트에서 실제 비동기 작업이나 요청 작업이 수행되지 않음을 주의하세요.
+        
         @Code(name: "CounterFeatureTests.swift", file: 01-03-04-code-0007.swift)
       }
       
       @Step {
         Now that we have overridden the `numberFact` client to always return something predictable,
         we can drop the `timeout` from `receive` and properly assert on how state changes.
+        
+        이제 `numberFact` 클라이언트를 항상 예측 가능한 값을 반환하도록 재정의했으므로, 
+        `receive`에서 `timeout`을 제거하고 상태 변화에 대해 적절히 검증할 수 있습니다.
         
         @Code(name: "CounterFeatureTests.swift", file: 01-03-04-code-0008.swift)
       }
@@ -433,6 +684,12 @@
       a controlled environment, and providing onboarding for your users that run your features
       in a sandbox so that you do not accidentally make changes to the outside world that you 
       did not expect.
+      
+      이것이 기능을 테스트할 준비를 하는 데 필요한 전부입니다. 몇 가지 사전 단계가 필요하지만, 
+      완료되면 즉시 모든 기능에서 의존성을 사용할 수 있습니다. 테스트 작성 외에도 의존성을 제어하는 
+      더 많은 이점이 있습니다. 예를 들어, 제어된 환경에서 Xcode 미리보기를 실행하거나, 
+      기능을 샌드박스에서 실행하여 사용자가 예상치 못한 외부 세계에 대한 변경을 실수로 하지 않도록 
+      온보딩을 제공하는 것 등이 있습니다.
     }
   }
 }
