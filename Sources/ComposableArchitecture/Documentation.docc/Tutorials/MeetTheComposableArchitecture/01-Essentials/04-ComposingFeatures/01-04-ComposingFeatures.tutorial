@@ -2,6 +2,8 @@
   @Intro(title: "Composing features") {
     Learn what makes the Composable Architecture… well… "composable". We will create a parent 
     feature that contains the `CounterFeature` we have been building thus far.
+    
+    Composable Architecture가 어떻게 "컴포저블"한지를 알아봅니다. 지금까지 구축해온 `CounterFeature`를 포함하는 부모 기능을 만들 것입니다.
   }
   
   @Section(title: "Adding a tab view") {
@@ -9,17 +11,23 @@
       We will explore composing features together by adding a `TabView` feature with two tabs,
       each housing a `CounterFeature`. This will give us the opportunity to explore the `Scope`
       reducer and the `scope` operator on stores.
+      
+      두 개의 탭을 가진 `TabView` 기능을 추가하여 기능을 함께 구성하는 방법을 탐구할 것입니다. 각 탭은 `CounterFeature`를 포함하고 있습니다. 이를 통해 `Scope` 리듀서와 스토어의 `scope` 연산자를 탐구할 기회를 얻게 됩니다.
     }
-    
     
     @Steps {
       Let's approach this in a naive way first by trying to create a root level view that uses
       a `TabView`. To keep things simple we will just have two tabs, and each will contain their
       own isolated `CounterView`, which was built previously in the tutorial.
       
+      먼저 `TabView`를 사용하는 루트 레벨 뷰를 생성하여 이 문제에 단순하게 접근해보겠습니다. 
+      간단하게 하기 위해 두 개의 탭만 만들고, 각 탭은 이전 튜토리얼에서 만든 자체적으로 격리된 `CounterView`를 포함할 것입니다.
+      
       @Step {
         Create a new file called AppFeature.swift with some basic scaffolding in place already
         for a tab-based view.
+        
+        탭 기반 뷰를 위한 기본 구조가 이미 포함된 AppFeature.swift라는 새 파일을 만듭니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-01-code-0001.swift)
       }
@@ -28,18 +36,28 @@
         In the tab view we want to create two `CounterView`s, one for each tab, but in order to do
         so we need to supply two stores.
         
+        탭 뷰에서 각 탭에 대해 하나씩 두 개의 `CounterView`를 만들고자 합니다. 이를 위해 두 개의 스토어를 제공해야 합니다.
+        
         @Code(name: "AppFeature.swift", file: 01-04-01-code-0002.swift)
       }
       
       Where do we get these stores from? Previously when building the `CounterView` the store was
       defined as a simple `let` property and then whoever constructed the `CounterView` (e.g. 
-      the SwiftUI preview and app entry point) was responsibile for constructing the store and 
+      the SwiftUI preview and app entry point) was responsible for constructing the store and 
       passing it along.
+      
+      이러한 스토어는 어디에서 얻을 수 있을까요? 이전에 `CounterView`를 만들 때 스토어는 
+      간단한 `let` 속성으로 정의되었고, `CounterView`를 구성한 사람(예: SwiftUI 미리보기 및 앱 진입점)이 스토어를 구성하고 
+      전달하는 책임이 있었습니다.
       
       We could try that same strategy here.
       
+      여기서도 같은 전략을 시도할 수 있습니다.
+      
       @Step {
         Add two new variables to `AppView` that hold stores to be provided to each `CounterView`.
+        
+        각 `CounterView`에 제공할 스토어를 보유하는 두 개의 새로운 변수를 `AppView`에 추가합니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-01-code-0003.swift)
       }
@@ -48,14 +66,24 @@
       of communicating with each other. In the future there may be events that happen in one
       tab that can affect the other tab.
       
+      그러나 이는 이상적이지 않습니다. 이제 서로 통신할 수 없는 완전히 격리된 두 개의 스토어가 있습니다. 
+      미래에는 한 탭에서 발생하는 이벤트가 다른 탭에 영향을 미칠 수 있습니다.
+      
       This is why in the Composable Architecture we prefer to compose features together and have
       our views powered by a single ``ComposableArchitecture/Store``, rather than have multiple
       isolated stores. This makes it extremely easy for features to communicate with each other,
       and we can even write tests that the communication is working properly.
       
+      이러한 이유로, Composable Architecture에서는 기능을 함께 구성하고 여러 개의 격리된 스토어를 갖기보다는 
+      단일 ``ComposableArchitecture/Store``로 뷰를 구동하는 것을 선호합니다. 
+      이렇게 하면 기능 간의 통신이 매우 쉬워지고, 통신이 제대로 작동하는지 테스트를 작성할 수도 있습니다.
+      
       So, let's put the view aside for a moment and focus first on composing our features' reducers
       together into a single package, and then we will come back to the view and see how to 
       properly create this tab view.
+      
+      그러면 잠시 뷰를 제쳐두고 기능의 리듀서를 하나의 패키지로 함께 구성하는 데 집중한 다음, 
+      다시 뷰로 돌아와서 이 탭 뷰를 올바르게 만드는 방법을 살펴보겠습니다.
     }
   }
     
@@ -65,6 +93,9 @@
       weird situation of having multiple isolated stores. We can fix this problem by first composing
       the features together at the reducer level, and then showing how we can have a single store
       power our tab-based application.
+      
+      이제 우리는 기능을 단순하게 구성하는 문제에 접근함으로써 여러 개의 격리된 스토어가 있는 이상한 상황에 직면했습니다. 
+      이 문제를 해결하기 위해 먼저 리듀서 수준에서 기능을 함께 구성한 다음, 단일 스토어가 탭 기반 애플리케이션을 구동하는 방법을 보여줄 것입니다.
     }
     
     @Steps {
@@ -73,8 +104,14 @@
       just as we did for `CounterFeature` and `CounterView`. We personally prefer to do this until
       our features get too big, and then we will split the reducer and view into their own files.
       
+      이제 위에서 만든 `AppView`의 로직과 동작을 구동할 새로운 앱 수준 리듀서를 생성할 것입니다. 
+      또한 `CounterFeature`와 `CounterView`와 마찬가지로 리듀서를 뷰와 동일한 파일에 배치할 것입니다. 
+      우리는 기능이 너무 커질 때까지 이렇게 하는 것을 선호하며, 그 후에는 리듀서와 뷰를 각각의 파일로 분리할 것입니다.
+      
       @Step {
         Create a new `AppFeature` struct and apply the ``ComposableArchitecture/Reducer()`` macro.
+        
+        새로운 `AppFeature` 구조체를 만들고 ``ComposableArchitecture/Reducer()`` 매크로를 적용합니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-02-code-0001.swift)
       }
@@ -83,10 +120,15 @@
         Add a `State` struct and `Action` enum to the reducer. These data types will hold the state
         and actions for each tab, each of which are just the `CounterFeature`.
         
+        리듀서에 `State` 구조체와 `Action` 열거형을 추가합니다. 이 데이터 타입은 각 탭에 대한 상태와 
+        액션을 보유하며, 각 탭은 단순히 `CounterFeature`입니다.
+        
         @Code(name: "AppFeature.swift", file: 01-04-02-code-0002.swift)
         
         > Note: We are proactively conforming `State` to `Equatable` in order to be able to write
         tests on this feature later.
+        
+        > 참고: 나중에 이 기능에 대한 테스트를 작성할 수 있도록 `State`를 `Equatable`에 적합하게 만듭니다.
       }
       
       @Step {
@@ -94,9 +136,16 @@
         Previously we did this by using the ``ComposableArchitecture/Reduce`` type to open a closure
         and perform any state mutations necessary based on the action passed in. 
         
+        다음으로 리듀서의 ``ComposableArchitecture/Reducer/body-20w8t``를 구현해야 합니다. 
+        이전에는 ``ComposableArchitecture/Reduce`` 타입을 사용하여 클로저를 열고 
+        전달된 액션에 따라 필요한 상태 변경을 수행했습니다.
+        
         We still want to do that for the core logic of the app feature, but we also want compose in
         the  `CounterFeature` reducer so that its logic can execute on the `tab1` and `tab2` state
         without the `AppFeature` having to recreate it.
+        
+        앱 기능의 핵심 로직에 대해서는 여전히 그렇게 하고 싶지만, `CounterFeature` 리듀서를 함께 구성하여 
+        `AppFeature`가 이를 재생성하지 않고도 `tab1` 및 `tab2` 상태에서 해당 로직을 실행할 수 있도록 하고 싶습니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-02-code-0003.swift)
       }
@@ -108,12 +157,21 @@
         twice. First we single out the `tab1` state and actions in order to run the `CounterFeature`
         reducer, and then we do it again for the `tab2` state and actions.
         
+        `CounterFeature`를 `AppFeature`에 구성하기 위해 ``ComposableArchitecture/Scope`` 리듀서를 사용할 수 있습니다. 
+        이를 통해 부모 기능의 하위 도메인에 집중하고 해당 하위 도메인에서 자식 리듀서를 실행할 수 있습니다. 
+        이 경우 두 번 수행하고자 합니다. 먼저 `tab1` 상태와 액션을 분리하여 `CounterFeature` 리듀서를 실행하고, 
+        그런 다음 `tab2` 상태와 액션에 대해서도 동일하게 수행합니다.
+        
         > Note: The `body` computed property is using result builders behind the scenes. It allows
-        us to list any number of reducers in the `body` as  long as the types match up. When an
+        us to list any number of reducers in the `body` as long as the types match up. When an
         action comes into the system each reducer will run on the feature's state from 
         top-to-bottom. Result builders is also what SwiftUI uses to compose view hierarchies
         in a view `body`.
         
+        > 참고: `body` 계산된 속성은 내부적으로 result builder를 사용합니다. 
+        > 이는 `body`에서 타입이 일치하는 한 여러 개의 리듀서를 나열할 수 있게 해줍니다. 
+        > 액션이 시스템에 들어오면 각 리듀서는 기능의 상태에서 위에서 아래로 실행됩니다. 
+        > result builder는 SwiftUI가 뷰 `body`에서 뷰 계층 구조를 구성하는 데 사용하는 것입니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-02-code-0004.swift)
       }
@@ -122,15 +180,24 @@
       there's the core app feature logic, the counter feature running in the first tab, and the
       counter feature running in the second tab.
       
+      이제 `AppFeature`는 3개의 완전히 독립적인 기능으로 구성된 완전한 구성 기능입니다. 
+      여기에는 핵심 앱 기능 로직, 첫 번째 탭에서 실행되는 카운터 기능, 두 번째 탭에서 실행되는 카운터 기능이 포함됩니다.
+      
       We can even write a test for this integration of features before even getting the view 
       properly working.
+      
+      뷰가 제대로 작동하기 전에 이 기능 통합에 대한 테스트를 작성할 수 있습니다.
       
       @Step {
         Create a new file in your test target called AppFeatureTests.swift and paste in the 
         following basic scaffolding.
         
+        테스트 타겟에 AppFeatureTests.swift라는 새 파일을 만들고 다음 기본 구조를 붙여넣습니다.
+        
         We are going to start by showing that when the increment button is tapped in the first tab,
         the count goes up in the `tab1` state.
+        
+        첫 번째 탭에서 증가 버튼을 탭하면 `tab1` 상태에서 카운트가 증가하는 것을 보여줄 것입니다.
         
         @Code(name: "AppFeatureTests.swift", file: 01-04-02-code-0005.swift)
       }
@@ -140,9 +207,15 @@
         This is done by providing the initial state of the feature and specifying
         the reducer that powers the feature.
         
+        `AppFeature` 도메인을 보유하는 ``ComposableArchitecture/TestStore``를 생성합니다. 
+        이는 기능의 초기 상태를 제공하고 기능을 구동하는 리듀서를 지정하여 수행됩니다.
+        
         > Note: Remember that the `TestStore` is the testable runtime of a feature that allows you 
         to send actions and assert on how state changes. It also forces you to assert on how effects
         emit data back into the system.
+        
+        > 참고: `TestStore`는 액션을 전송하고 상태 변화에 대해 검증할 수 있는 기능의 테스트 가능한 실행 환경입니다. 
+        > 또한 이팩트가 시스템으로 데이터를 다시 전송하는 방식을 검증하도록 강제합니다.
         
         @Code(name: "AppFeatureTests.swift", file: 01-04-02-code-0006.swift)
       }
@@ -151,12 +224,20 @@
         Send an action into the test store to emulate the user tapping on the increment button
         in the first tab.
         
-        > Tip: Use case key path syntax when sending actions through multiple layers of features.
+        첫 번째 탭에서 증가 버튼을 탭하는 사용자를 흉내내기 위해 테스트 스토어에 액션을 전송합니다.
         
+        > Tip: Use case key path syntax when sending actions through multiple layers of features.
+
+        > 팁: 여러 계층의 기능을 통해 액션을 전송할 때 케이스 키 패스 구문을 사용하세요.
+
         > Note: The nesting of the action enums of the features gives us a natural way to 
         distinguish between actions in different tabs. Sending `\.tab1.incrementButtonTapped` is 
         very different from sending  `\.tab2.incrementButtonTapped`.
         
+        > 참고: 기능의 액션 열거형의 중첩은 서로 다른 탭의 액션을 구분하는 자연스러운 방법을 제공합니다. 
+        > `\.tab1.incrementButtonTapped`를 보내는 것은 `\.tab2.incrementButtonTapped`를 보내는 것과 
+        > 매우 다릅니다.
+
         @Code(name: "AppFeatureTests.swift", file: 01-04-02-code-0007.swift)
       }
       
@@ -164,23 +245,34 @@
       changes after sending this action, and by default the ``ComposableArchitecture/TestStore``
       requires that you exhaustively assert on everything happening in the feature.
       
+      이 테스트를 실행하면 물론 실패할 것입니다. 이는 이 액션을 보낸 후 상태 변화에 대해 검증하지 않았기 때문이며, 
+      기본적으로 ``ComposableArchitecture/TestStore``는 기능에서 발생하는 모든 것에 대해 철저히 검증할 것을 요구합니다.
+      
       @Step {
         To get the test to pass we have to open up a trailing closure on `store.send` and mutate
         the previous version of the feature state so that it matches the state after the action
         is sent.
         
+        테스트가 통과하도록 하려면 `store.send`에서 후행 클로저를 열고 이전 버전의 기능 상태를 변경하여 
+        액션이 전송된 후 상태와 일치하도록 해야 합니다.
+        
         @Code(name: "AppFeatureTests.swift", file: 01-04-02-code-0008.swift)
       }
       
       And now this test passes!
+      
+      이제 이 테스트가 통과합니다!
     }
   }
   
-   @Section(title: "Deriving child stores") {
+  @Section(title: "Deriving child stores") {
     @ContentAndMedia {
       Now that we have a single composed `AppFeature` that encapsulates all of the logic and 
       behavior of the root app and its tabs, we can properly implement the view layer of the 
       application.
+      
+      이제 모든 로직과 동작을 캡슐화한 단일 구성된 `AppFeature`가 있으므로, 
+      애플리케이션의 뷰 레이어를 제대로 구현할 수 있습니다.
     }
     
     @Steps {
@@ -188,8 +280,13 @@
       onto a single store of the composed `AppFeature` domain, and derive child stores for each
       tab that can be handed to the `CounterView`s.
       
+      `AppView`에서 각 탭에 대한 개별 스토어를 보유하는 대신, 이제 구성된 `AppFeature` 도메인의 
+      단일 스토어를 보유하고, 각 탭에 대해 `CounterView`에 전달할 수 있는 자식 스토어를 파생할 수 있습니다.
+      
       @Step {
         Replace the two individual store properties with a single store of the `AppFeature` domain.
+        
+        두 개의 개별 스토어 속성을 `AppFeature` 도메인의 단일 스토어로 교체합니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-03-code-0001.swift, previousFile: 01-04-03-code-0001-previous.swift)
       }
@@ -200,11 +297,17 @@
         domain. This is done by using key path syntax to single out the field of the state and
         the case of the action enum.
         
+        ``ComposableArchitecture/Store``에서 ``ComposableArchitecture/Store/scope(state:action:)-90255`` 메서드를 사용하여 
+        `tab1` 도메인에만 집중하는 자식 스토어를 파생합니다. 이는 상태의 필드와 액션 열거형의 경우를 
+        구분하기 위해 키 경로 문법을 사용하여 수행됩니다.
+        
         @Code(name: "AppFeature.swift", file: 01-04-03-code-0002.swift)
       }
       
       @Step {
         And do the same for the second tab.
+        
+        두 번째 탭에 대해서도 동일하게 수행합니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-03-code-0003.swift)
       }
@@ -213,8 +316,14 @@
       entire view, and the logic and behavior of both tabs have been composed into a single reducer.
       We can give the feature a spin by creating a preview in AppFeature.swift.
       
+      이것이 전부입니다. 이제 이 전체 뷰를 구동하는 단일 ``ComposableArchitecture/Store``가 있으며, 
+      두 탭의 로직과 동작이 단일 리듀서로 구성되었습니다. AppFeature.swift에서 미리보기를 생성하여 
+      기능을 시험해볼 수 있습니다.
+      
       @Step {
         Create a preview for `AppView` by initializing a store with the `AppFeature` domain.
+        
+        `AppView`에 대한 미리보기를 생성하기 위해 `AppFeature` 도메인으로 스토어를 초기화합니다.
         
         @Code(name: "AppFeature.swift", file: 01-04-03-code-0004.swift)
       }
@@ -222,8 +331,12 @@
       We can also run the feature in the simulator by updating the entry point of the app to be
       powered by the `AppView`.
       
+      앱의 진입점을 `AppView`로 구동하도록 업데이트하여 시뮬레이터에서 기능을 실행할 수 있습니다.
+      
       @Step {
         Open App.swift and update the entry point to use `AppView` and `AppFeature`.
+        
+        App.swift를 열고 진입점을 `AppView`와 `AppFeature`를 사용하도록 업데이트합니다.
         
         @Code(name: "App.swift", file: 01-04-03-code-0005.swift, previousFile: 01-04-03-code-0005-previous.swift)
       }
@@ -235,9 +348,19 @@
       using the ``ComposableArchitecture/Store/scope(state:action:)-90255`` and hand those child
       stores to the child views.
       
+      Composable Architecture에서 기능을 함께 구성하는 기본 사항입니다. 가장 간단한 형태로는 
+      부모 리듀서의 `body`에서 리듀서를 함께 구성하고, ``ComposableArchitecture/Scope`` 리듀서를 사용하여 
+      자식 리듀서를 실행하기 위해 부모의 하위 도메인에 집중하는 것으로 시작합니다. 
+      그런 다음 뷰에서 ``ComposableArchitecture/Store/scope(state:action:)-90255``를 사용하여 
+      부모로부터 자식 스토어를 파생하고, 해당 자식 스토어를 자식 뷰에 전달합니다.
+      
       There are more advanced ways of composing features, especially when it comes to navigation. 
       See the article <doc:Navigation> for more information on the navigation tools in the library,
       as well as the second tutorial in <doc:MeetComposableArchitecture>.
+      
+      기능을 구성하는 더 고급 방법이 있으며, 특히 내비게이션과 관련하여 그렇습니다. 
+      라이브러리의 내비게이션 도구에 대한 자세한 내용은 <doc:Navigation> 기사를 참조하고, 
+      <doc:MeetComposableArchitecture>의 두 번째 튜토리얼도 확인하세요.
     }
   }
 }
