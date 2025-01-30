@@ -2,18 +2,28 @@
   @Intro(title: "Navigation stacks") {
     We will continue with the contacts application built in previous sections by adding
     a navigation stack to the root of the application so that we can drill down to a contact.
+    
+    우리는 애플리케이션의 루트에 내비게이션 스택을 추가하여 연락처를 세부적으로 탐색할 수 있도록 
+    이전 섹션에서 구축한 연락처 애플리케이션을 계속 발전시킬 것입니다.
   }
   
   @Section(title: "Contact detail feature") {
     @ContentAndMedia {
       We are going to add a new "Contact Detail" feature that will allow us to drill down a layer
       from the contacts list at the root.
+
+      우리는 루트에 있는 연락처 목록에서 한 단계 더 들어가게 해주는 새로운 "Contact Detail" feature를 추가할 것입니다.
     }
     
     @Steps {
       @Step {
         Create a new file called ContactDetailFeature.swift, import the Composable Architecture, and 
         start a stub of a reducer by using the ``ComposableArchitecture/Reducer()`` macro.
+        
+        ContactDetailFeature.swift라는 새 파일을 만들고, 
+        Composable Architecture를 가져오고, 
+        ``ComposableArchitecture/Reducer()`` 매크로를 사용하여 
+        리듀서의 기본 구조를 시작합니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0000.swift)
       }
@@ -23,6 +33,10 @@
         ``ComposableArchitecture/Reducer`` protocol. The only state we currently need is the
         contact, and it can be `let` since we do not plan on mutating it from this screen.
         
+        ``ComposableArchitecture/Reducer/State`` 구조체를 추가하여 
+        ``ComposableArchitecture/Reducer`` 프로토콜의 요구 사항을 이행합니다. 
+        현재 필요한 유일한 상태는 연락처이며, 이 화면에서 변경할 계획이 없으므로 `let`으로 선언할 수 있습니다.
+        
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0001.swift)
       }
       
@@ -30,6 +44,10 @@
         Add an ``ComposableArchitecture/Reducer/Action`` enum to fulfill that requirement for the
         ``ComposableArchitecture/Reducer`` protocol. There are not currently any actions that can
         be performed in this feature, so we will leave it empty.
+        
+        ``ComposableArchitecture/Reducer/Action`` 열거형을 추가하여 
+        ``ComposableArchitecture/Reducer`` 프로토콜의 요구 사항을 충족합니다. 
+        현재 이 기능에서 수행할 수 있는 작업은 없으므로 비워두겠습니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0002.swift)
       }
@@ -39,11 +57,18 @@
         requirement of ``ComposableArchitecture/Reducer`` protocol. Since there are no actions in 
         this feature there is nothing we can do in the reducer. More will be added to this later.
         
+        ``ComposableArchitecture/Reducer/body-20w8t`` 속성을 구현하여 
+        ``ComposableArchitecture/Reducer`` 프로토콜의 요구 사항을 충족합니다. 
+        이 feature에는 작업이 없으므로 리듀서에서 할 수 있는 일이 없습니다. 
+        더 많은 내용은 나중에 추가될 것입니다.
+        
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0003.swift)
       }
       
       @Step {
         Create a stub for a `ContactDetailView`.
+        
+        `ContactDetailView`의 초안을 만듭니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0004.swift, reset: true)
       }
@@ -53,6 +78,9 @@
         `ContactDetailFeature` domain, allowing it to observe the feature's state changes and 
         send actions.
         
+        뷰는 `ContactDetailFeature` 도메인의 ``ComposableArchitecture/Store``를 보유하여 
+        기능의 상태 변경을 관찰하고 작업을 보낼 수 있도록 합니다.
+        
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0005.swift)
       }
       
@@ -60,11 +88,16 @@
         Stub out a basic form. There is no real information to show in this view now other than the
         contact's name, but more will be added later.
         
+        기본 양식의 임시 구조를 만듭니다. 현재 이 뷰에서 보여줄 실제 정보는 
+        연락처의 이름뿐이지만, 나중에 더 많은 내용이 추가될 것입니다.
+        
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0006.swift)
       }
       
       @Step {
         Add a preview so that we can see what the view looks like.
+        
+        preview를 추가하여 뷰가 어떻게 생겼는지 볼 수 있도록 합니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-01-code-0007.swift) {
           @Image(source: ch02-sub04-sec01-image-0000)
@@ -73,6 +106,9 @@
       
       Nothing special so far, but we need a basic feature built so that we start pushing it onto
       a navigation stack.
+      
+      지금까지 특별한 것은 없지만, 내비게이션 스택에 푸시할 수 있도록 
+      기본 기능을 구축해야 합니다.
     }
   }
   
@@ -80,6 +116,9 @@
     @ContentAndMedia {
       Now that a new "Contact Detail" feature has been built we will make it possible to drill
       down to it from the main list of contacts.
+      
+      이제 새로운 "Contact Detail" feature가 구축되었으므로 
+      연락처 목록에서 이를 이동할 수 있도록 하겠습니다.
     }
     
     @Steps {
@@ -89,9 +128,18 @@
         push onto the stack. This state represents the features that are currently
         pushed onto the stack.
         
+        `ContactsFeature.swift`로 이동하여 상태에 새 필드를 추가합니다. 
+        이 필드는 ``ComposableArchitecture/StackState`` 유형이 될 것이며, 
+        스택에 푸시할 수 있는 기능의 제네릭입니다. 
+        이 상태는 현재 스택에 푸시된 기능을 나타냅니다.
+        
         > Note: The ``ComposableArchitecture/StackState`` type is specifically made for the 
         Composable Architecture, and makes it easy and ergonomic to integrate stack navigation
         into your applications.
+        
+        > 참고: ``ComposableArchitecture/StackState`` 유형은 
+        Composable Architecture를 위해 특별히 만들어졌으며, 
+        애플리케이션에 스택 내비게이션을 통합하는 것을 쉽게 하고 편리하게 만듭니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0000.swift, previousFile: 02-04-02-code-0000-previous.swift) 
       }
@@ -105,8 +153,16 @@
         > Tip: ``StackAction`` is generic over both state and action of the `Path` domain, and so
         > you can use the ``StackActionOf`` type alias to simplify the syntax a bit.
         
+        ``ComposableArchitecture/StackAction``를 보유하는 액션 열거형에 케이스를 추가합니다. 
+        이는 스택 내에서 발생할 수 있는 작업을 나타내며, 
+        스택에서 요소를 푸시하거나 팝하는 것, 
+        또는 스택 내 특정 기능에서 발생하는 작업을 포함합니다.
+        
         We will also handle the `.path` case in the reducer and return 
         ``ComposableArchitecture/Effect/none`` for now.
+        
+        우리는 또한 리듀서에서 `.path` 케이스를 처리하고 
+        현재는 ``ComposableArchitecture/Effect/none``을 반환할 것입니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0001.swift) 
       }
@@ -116,8 +172,15 @@
         ``ComposableArchitecture/Reducer/forEach(_:action:destination:fileID:filePath:line:column:)-9svqb`` operator 
         to integrate the `ContactDetailFeature` into the stack of the `ContactsFeature`.
         
+        리듀서의 가장 끝에서 
+        ``ComposableArchitecture/Reducer/forEach(_:action:destination:fileID:filePath:line:column:)-9svqb`` 연산자를 사용하여 
+        `ContactDetailFeature`를 `ContactsFeature`의 스택에 통합합니다.
+        
         > Tip: Scroll down to the bottom of the code snippet to see the application of the
         > `forEach` operator.
+        
+        > 팁: 코드 스니펫의 맨 아래로 스크롤하여 
+        > `forEach` 연산자의 적용을 확인하세요.
         
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0002.swift) 
       }
@@ -131,6 +194,16 @@
         ``ComposableArchitecture/StackState`` and ``ComposableArchitecture/StackAction``, and it
         handles the rest.
         
+        연락처 목록의 뷰를 보유한 `ContactsView`로 이동합니다. 
+        `NavigationStack`을 
+        ``SwiftUI/NavigationStack/init(path:root:destination:fileID:filePath:line:column:)``로 교체합니다. 
+        이는 ``ComposableArchitecture/Store``에서 스택을 구동하기 위해 특별히 조정된 
+        이니셜라이저입니다. 
+        이 이니셜라이저에 
+        ``ComposableArchitecture/StackState`` 및 
+        ``ComposableArchitecture/StackAction``으로 범위가 제한된 
+        스토어에 대한 바인딩을 전달하면 나머지는 자동으로 처리됩니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0003.swift, previousFile: 02-04-02-code-0003-previous.swift) 
       }
       
@@ -139,6 +212,12 @@
         closures. The first is for the root of the stack, which is our list of contacts. The second 
         is to describe the destinations that can be navigated to. It is handled a store that is 
         focused on the domain of just a single element in the stack.
+        
+        ``SwiftUI/NavigationStack/init(path:root:destination:fileID:filePath:line:column:)``는 두 개의 후행 
+        클로저를 사용합니다. 첫 번째는 스택의 루트로, 
+        이는 우리의 연락처 목록입니다. 두 번째는 
+        이동할 수 있는 목적지를 설명합니다. 
+        이는 스택의 단일 요소 도메인에 집중된 스토어에서 처리됩니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0004.swift) 
       }
@@ -149,15 +228,28 @@
         library. We are also applying a `.borderless` button style so that we can have the delete
         button in the row too.
         
+        연락처 목록의 행을 `NavigationLink`로 감싸고, 
+        이 라이브러리와 함께 제공되는 
+        ``SwiftUI/NavigationLink/init(state:label:fileID:filePath:line:column:)`` 이니셜라이저를 사용합니다. 
+        우리는 또한 행에 삭제 버튼을 추가할 수 있도록 
+        `.borderless` 버튼 스타일을 적용하고 있습니다.
+        
         > Warning: It is necessary to use the
         > ``SwiftUI/NavigationLink/init(state:label:fileID:filePath:line:column:)`` initializer on `NavigationLink`
         > instead of the `init(value:)` initializer that comes with SwiftUI.
+        
+        > 경고: `NavigationLink`에서 
+        > `init(value:)` 이니셜라이저 대신 
+        > ``SwiftUI/NavigationLink/init(state:label:fileID:filePath:line:column:)`` 이니셜라이저를 사용하는 것이 필요합니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-04-02-code-0005.swift, previousFile: 02-04-02-code-0005-previous.swift) 
       }
       
       @Step {
         Run the application to see that we can now drill down one level, for each contact.
+        
+        애플리케이션을 실행하여 각 연락처에 대해 
+        이제 한 단계 이동할 수 있는지 확인합니다.
         
         @Video(source: ch02-sub04-sec01-video-0000) 
       }
@@ -170,6 +262,11 @@
       interaction between the detail screen and the contacts list. Let's change this by allowing
       you to delete a contact from the detail screen. We will first prompt the user with an alert
       asking them to confirm deletion, just as we did in <doc:02-02-MultipleDestinations>.
+      
+      현재 세부 화면과 연락처 목록 간의 상호작용이 없습니다. 
+      이를 변경하여 세부 화면에서 연락처를 삭제할 수 있도록 하겠습니다. 
+      먼저 사용자에게 삭제를 확인하는 알림을 표시할 것입니다. 
+      이는 <doc:02-02-MultipleDestinations>에서 했던 것과 같습니다.
     }
     
     @Steps {
@@ -177,6 +274,11 @@
         Go to ContactDetailFeature.swift to add more functionality to the reducer and view. We
         will start by adding some optional ``ComposableArchitecture/PresentationState`` to represent
         show the alert.
+        
+        ContactDetailFeature.swift로 이동하여 리듀서와 뷰에 
+        더 많은 기능을 추가합니다. 
+        먼저 알림을 표시하기 위해 
+        선택적 ``ComposableArchitecture/PresentationState``를 추가합니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-03-code-0000.swift, previousFile: 02-04-03-code-0000-previous.swift) 
       }
@@ -186,8 +288,18 @@
         such as tapping the "Delete" button, as well as any actions inside the alert and the 
         delegate actions for when we need to tell the parent feature to delete the contact.
         
+        UI에서 사용자가 할 수 있는 모든 작업에 대해 
+        `ContactDetailFeature.Action`에 케이스를 추가합니다. 
+        여기에는 "삭제" 버튼을 탭하는 것과 
+        알림 내의 모든 작업 및 연락처를 삭제해야 할 때 
+        부모 기능에 알리는 델리게이트 작업이 포함됩니다.
+        
         > Note: The alert and delegate actions do not need an ID like was needed before. You will
         > see why soon.
+        
+        > 참고: 알림 및 델리게이트 작업에는 이전에 필요했던 것처럼 
+        ID가 필요하지 않습니다. 
+        곧 그 이유를 알게 될 것입니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-03-code-0001.swift) 
       }
@@ -199,12 +311,24 @@
         dependency, and we have extracted the alert state to its own helper to make it easier to 
         test later.
         
+        `body` 속성에서 새로운 작업을 구현합니다. 
+        이는 <doc:02-02-MultipleDestinations>에서 했던 것과 매우 유사합니다. 
+        우리는 삭제 확인을 처리하기 위해 
+        델리게이트 작업을 보내고, 
+        알림 상태를 더 쉽게 테스트할 수 있도록 
+        별도의 헬퍼로 추출했습니다.
+        
         @Code(name: "ContactDetailFeature.swift", file: 02-04-03-code-0002.swift) 
       }
       
       @Step {
         Go to the `ContactDetailView` struct and add a button for deleting the contact, as well as
         use the `alert(store:)` modifier to show an alert with the `alert` state becomes non-`nil`.
+        
+        `ContactDetailView` 구조체로 이동하여 
+        연락처를 삭제하기 위한 버튼을 추가하고, 
+        `alert(store:)` 수정자를 사용하여 
+        `alert` 상태가 비-`nil`이 될 때 알림을 표시합니다.
         
         @Code(name: "ContactDetailFeature.swift", file: 02-04-03-code-0003.swift, previousFile: 02-04-03-code-0003-previous.swift) 
       }
@@ -215,6 +339,12 @@
         `.delegate(.confirmDeletion)` action is sent, and in that case remove the contact from the
         array.
         
+        ContactsFeature.swift로 이동하여 
+        `.path` 작업을 구조 분해하여 
+        스택의 각 요소에서 무슨 일이 일어나고 있는지 확인합니다. 
+        특히, `.delegate(.confirmDeletion)` 작업이 전송될 때 
+        연락처를 배열에서 제거하고자 합니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-04-03-code-0004.swift, previousFile: 02-04-03-code-0004-previous.swift) 
       }
       
@@ -222,6 +352,11 @@
         Run the preview to see that the application works as expected. You can drill down to a 
         contact, tap the delete button, confirm deletion, and then the detail is popped off the
         stack and the contact is removed from the list.
+        
+        미리보기를 실행하여 애플리케이션이 예상대로 작동하는지 확인합니다. 
+        연락처로 드릴다운하고, 삭제 버튼을 탭하고, 
+        삭제를 확인한 후 세부 정보가 스택에서 제거되고 
+        연락처가 목록에서 제거됩니다.
         
         @Video(source: "ch02-sub04-sec03-video-0000") 
       }

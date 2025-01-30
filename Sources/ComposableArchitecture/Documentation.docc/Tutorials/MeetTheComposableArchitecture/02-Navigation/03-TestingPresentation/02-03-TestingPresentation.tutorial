@@ -53,7 +53,7 @@
         
         사용자가 "+" 버튼을 탭하는 것을 에뮬레이트하기 위해 
         `addButtonTapped` 액션을 전송합니다. 제공된 후행 클로저는 
-        액션을 전송한 후 상태가 어떻게 변경되는지 단언하는 곳입니다.
+        액션을 전송한 후 상태가 어떻게 변경되는지 검증하는 곳입니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-01-code-0002.swift)
       }
@@ -159,7 +159,7 @@
         where we can assert on how state changed after sending the action.
         
         연락처의 이름 텍스트 필드에 사용자가 입력하는 것을 에뮬레이트합니다. 
-        후행 클로저는 액션을 전송한 후 상태가 어떻게 변경되었는지 단언하는 곳입니다.
+        후행 클로저는 액션을 전송한 후 상태가 어떻게 변경되었는지 검증하는 곳입니다.
         
         > Tip: The payload of an action can be sent as a second argument when using case key path
         > syntax.
@@ -176,7 +176,7 @@
         To do this we can chain into the `addContact` case name directly and mutate a part of its
         associated value.
         
-        알림의 `addContact` 케이스를 통해 `destination`을 변경하여 상태가 어떻게 변경되었는지 단언합니다. 
+        알림의 `addContact` 케이스를 통해 `destination`을 변경하여 상태가 어떻게 변경되었는지 검증합니다. 
         
         이를 위해 `addContact` 케이스 이름에 직접 연결하여 그 연관 값의 일부를 변경할 수 있습니다.
 
@@ -219,7 +219,7 @@
         Assert that when a delegate action is received that state mutates by adding a contact to the
         array.
         
-        델리게이트 액션이 수신될 때 상태가 배열에 연락처를 추가하여 변경되는지 단언합니다.
+        델리게이트 액션이 수신될 때 상태가 배열에 연락처를 추가하여 변경되는지 검증합니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-01-code-0014.swift)
       }
@@ -228,7 +228,7 @@
         To further assert that the `saveContact` delegate action was received, you must
         annotate `AddContactFeature.Action.Delegate` with the `@CasePathable` macro.
         
-        `saveContact` 델리게이트 액션이 수신될 때를 추가로 단언하기 위해, 
+        `saveContact` 델리게이트 액션이 수신될 때를 추가로 검증하기 위해, 
         `AddContactFeature.Action.Delegate`에 `@CasePathable` 매크로로 주석을 달아야 합니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-03-01-code-0015.swift, previousFile: 02-03-01-code-0015-previous.swift)
@@ -237,7 +237,7 @@
       @Step {
         Now you can further dive into the `saveContact` case and even assert against its payload.
         
-        이제 `saveContact` 케이스에 더 깊이 들어가 그 페이로드에 대해 단언할 수 있습니다.
+        이제 `saveContact` 케이스에 더 깊이 들어가 그 페이로드에 대해 검증할 수 있습니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-01-code-0016.swift, previousFile: 02-03-01-code-0014.swift)
       }
@@ -249,7 +249,7 @@
         
         마지막으로 테스트 스토어가 
         ``ComposableArchitecture/PresentationAction/dismiss`` 액션을 수신하여 
-        "연락처 추가" feature가 닫히도록 단언합니다.
+        "연락처 추가" feature가 닫히도록 검증합니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-01-code-0017.swift)
       }
@@ -314,7 +314,7 @@
         do not want to.
         
         사용자가 "+" 버튼을 탭하는 것을 에뮬레이트하지만, 이번에는 후행 클로저를 제공하지 않습니다. 
-        비소모적 테스트 스토어에서는 상태 변경을 단언할 필요가 없습니다.
+        비소모적 테스트 스토어에서는 상태 변경을 검증할 필요가 없습니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-02-code-0002.swift)
       } 
@@ -324,7 +324,7 @@
         on any state changes in the child feature.
         
         연락처의 이름 텍스트 필드에 사용자가 입력하는 것을 에뮬레이트하지만, 
-        다시 한 번 자식 feature에서 상태 변경을 단언하지 않습니다.
+        다시 한 번 자식 feature에서 상태 변경을 검증하지 않습니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-02-code-0003.swift)
       }
@@ -344,8 +344,8 @@
         ``ComposableArchitecture/TestStore/skipReceivedActions(strict:fileID:file:line:column:)``.
         
         다음으로 사용자가 "저장" 버튼을 탭한 후에 
-        연락처가 배열에 추가되고 자식 feature가 닫히는지 단언하고자 합니다. 
-        그러나 모든 액션이 수신될 때까지는 이를 단언할 수 없으므로, 
+        연락처가 배열에 추가되고 자식 feature가 닫히는지 검증하고자 합니다. 
+        그러나 모든 액션이 수신될 때까지는 이를 검증할 수 없으므로, 
         ``ComposableArchitecture/TestStore/skipReceivedActions(strict:fileID:file:line:column:)``를 사용하여 이를 수행할 수 있습니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-02-code-0005.swift)
@@ -356,7 +356,7 @@
         `destination` state is `nil`'d out.
         
         기능의 최종 상태가 배열에 새로운 연락처가 추가되고 
-        `destination` 상태가 `nil`로 설정되었는지 단언합니다.
+        `destination` 상태가 `nil`로 설정되었는지 검증합니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-02-code-0006.swift)
       }
@@ -367,8 +367,8 @@
       user completed their steps.
       
       새로운 연락처를 목록에 추가하는 전체 사용자 흐름을 다루는 매우 높은 수준의 테스트를 작성하는 데 필요한 전부입니다. 
-      자식 feature의 모든 세부 사항을 단언할 필요는 없으며, 
-      대신 사용자가 단계를 완료한 후 연락처가 실제로 추가되었음을 단언할 수 있습니다.
+      자식 feature의 모든 세부 사항을 검증할 필요는 없으며, 
+      대신 사용자가 단계를 완료한 후 연락처가 실제로 추가되었음을 검증할 수 있습니다.
     }
   }
   
@@ -379,9 +379,9 @@
       then asserting that indeed the contact was removed.
     
       마지막으로 테스트할 중요한 feature는 연락처 삭제입니다. 
-      이는 버튼을 탭하고, 알림이 표시되는지 단언하고, 
+      이는 버튼을 탭하고, 알림이 표시되는지 검증하고, 
       알림을 통해 삭제를 확인한 후, 
-      실제로 연락처가 제거되었는지 단언하는 것을 포함합니다.
+      실제로 연락처가 제거되었는지 검증하는 것을 포함합니다.
     }
     
     @Steps {
@@ -480,7 +480,7 @@
         to assert against the alert, rather than building `AlertState` from scratch.
         
         `ContactsFeatureTests.swift`로 돌아가 새로 추가된 `deleteConfirmation` 정적 함수를 사용하여 
-        알림에 대해 단언합니다. 처음부터 `AlertState`를 만들지 않습니다.
+        알림에 대해 검증합니다. 처음부터 `AlertState`를 만들지 않습니다.
         
         Run the test to see this passes. This proves that when the delete button is tapped, an
         alert is shown to the user.
@@ -495,7 +495,7 @@
         Emulate the user confirming to delete contact by sending the `confirmDeletion` action 
         in the alert.
         
-        알림에서 `confirmDeletion` 액션을 전송하여 사용자가 연락처 삭제를 확인하는 것을 에뮬레이트합니다.
+        알림에서 `confirmDeletion` 액션을 전송하여 사용자가 연락처 삭제를 확인하는 것을 시뮬레이션합니다.
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-03-code-0009.swift)
       }
@@ -504,7 +504,7 @@
         Assert that the alert was dismissed and that the contact corresponding to the ID of 
         `UUID(1)` was removed. 
         
-        알림이 닫히고 ID가 `UUID(1)`인 연락처가 제거되었는지 단언합니다. 
+        알림이 닫히고 ID가 `UUID(1)`인 연락처가 제거되었는지 검증합니다. 
         
         @Code(name: "ContactsFeatureTests.swift", file: 02-03-03-code-0010.swift)
       }
