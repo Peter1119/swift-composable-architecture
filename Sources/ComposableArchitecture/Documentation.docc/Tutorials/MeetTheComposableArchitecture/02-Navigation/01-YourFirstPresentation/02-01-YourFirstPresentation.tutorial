@@ -3,6 +3,9 @@
     The Composable Architecture offers a variety of tools to help you present child features from
     parent features. To begin, we will explore presenting a feature that is driven off of optional
     state.
+    
+    Composable Architecture는 부모 기능에서 자식 기능을 표시하는 데 도움이 되는 다양한 도구를 제공합니다. 
+    시작하기 위해 선택적 상태에 의해 구동되는 기능을 표시하는 방법을 탐구할 것입니다.
   }
   
   @Section(title: "Project set up") {
@@ -11,6 +14,10 @@
       you want to add the ability to create a new contact. This should be done by tapping a "+" icon
       in the UI, a sheet will be presented where you can enter the contact's info, and then tapping
       a button will dismiss the sheet and add the contact to the list.
+      
+      루트에서 연락처 목록을 표시하는 애플리케이션에서 작업하고 있다고 가정해 보겠습니다. 
+      새 연락처를 생성하는 기능을 추가하고 싶습니다. 이는 UI에서 "+" 아이콘을 탭하여 수행되며, 
+      연락처 정보를 입력할 수 있는 시트가 표시되고, 버튼을 탭하면 시트가 닫히고 연락처가 목록에 추가됩니다.
       
       @Image(source: "ch02-sub01-sec01-image-0001")
     }
@@ -22,7 +29,13 @@
         data type, and a simple reducer with a collection of contacts, and a single action for when
         the "+" button is tapped. Currently that action is not yet implemented.
         
+        새로운 파일 ContactsFeature.swift를 생성하고 이 파일에 연락처 기능의 기본 요소를 추가합니다. 
+        현재는 간단한 `Contact` 모델 데이터 타입과 연락처 컬렉션을 가진 간단한 리듀서, 
+        "+" 버튼이 탭될 때의 단일 액션으로 구성됩니다. 현재 이 액션은 아직 구현되지 않았습니다.
+        
         > Note: We conform `State` to the `Equatable` protocol in order to test this feature later.
+
+        > 참고: 나중에 이 기능에 대한 테스트를 작성할 수 있도록 `State`를 `Equatable`에 적합하게 만듭니다.
 
         @Code(name: "ContactsFeature.swift", file: 02-01-01-code-0000.swift)
       }
@@ -31,12 +44,17 @@
         Add a view that holds onto a ``ComposableArchitecture/Store`` of the `ContactsFeature`
         and observes the store in order to show a list of contacts and send actions.
         
+        `ContactsFeature`의 ``ComposableArchitecture/Store``를 보유하고, 
+        연락처 목록을 표시하고 액션을 전송하기 위해 스토어를 관찰하는 뷰를 추가합니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-01-01-code-0001.swift, reset: true)
       }
       
       @Step {
         Add a preview with a few stubbed contacts already in the state so that we can see what
         the feature looks like.
+        
+        기능이 어떻게 생겼는지 보기 위해 상태에 몇 개의 스텁된 연락처가 포함된 미리보기를 추가합니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-01-code-0002.swift, reset: true) {
           @Image(source: "ch02-sub01-sec01-image-0001")
@@ -49,8 +67,15 @@
         button for dismissing, and a "Save" button that when tapped should dismiss the feature
         _and_ add the contact to the list of contacts in the parent.
         
+        새로운 파일 AddContactFeature.swift를 생성하여 새로운 연락처의 이름을 입력할 수 있는 
+        기능의 리듀서와 뷰를 보유합니다. 이 기능은 닫기 위한 "취소" 버튼과 
+        탭할 때 기능을 닫고 부모의 연락처 목록에 연락처를 추가하는 "저장" 버튼을 가집니다.
+        
         > Note: There is nothing to do in the `cancelButtonTapped` and `saveButtonTapped` actions
         > right now. They will be implemented later.
+        
+        > 참고: 현재 `cancelButtonTapped` 및 `saveButtonTapped` 액션에서는 아무 작업도 필요하지 않습니다. 
+        > 이들은 나중에 구현될 것입니다.
         
         @Code(name: "AddContactFeature.swift", file: 02-01-01-code-0003.swift, reset: true)
       }
@@ -60,8 +85,15 @@
         Since our view is going to have a text field, we will need to be able to derive bindings
         from the store. To do this we use the `@Bindable` property wrapper from SwiftUI.
         
+        `AddContactFeature`의 ``ComposableArchitecture/Store``를 보유하는 뷰를 추가합니다. 
+        뷰에 텍스트 필드가 있을 것이므로 스토어에서 바인딩을 파생할 수 있어야 합니다. 
+        이를 위해 SwiftUI의 `@Bindable` 속성 래퍼를 사용합니다.
+        
         > Note: If you are targeting older platforms and do not have access to `@Bindable`, you can
         > instead use `@Perception.Bindable`, which comes with the library.
+
+        > 참고: 이전 플랫폼을 대상으로 하고 `@Bindable`에 접근할 수 없는 경우, 
+        > 대신 라이브러리와 함께 제공되는 `@Perception.Bindable`을 사용할 수 있습니다.
 
         @Code(name: "AddContactFeature.swift", file: 02-01-01-code-0004.swift, reset: true)
       }
@@ -73,7 +105,10 @@
         you want to send when the binding is written to.
         
         > Note: See <doc:Bindings> for more information on using bindings in the Composable 
-        Architecture.
+        > Architecture.
+        
+        > 참고: Composable Architecture에서 바인딩을 사용하는 방법에 대한 자세한 내용은 
+        > <doc:Bindings>를 참조하세요.
         
         @Code(name: "AddContactFeature.swift", file: 02-01-01-code-0005.swift)
       }
@@ -82,11 +117,16 @@
         Add a "Save" and "Cancel" button to the view and send the corresponding actions when those
         buttons are tapped.
         
+        뷰에 "저장" 및 "취소" 버튼을 추가하고 해당 버튼이 탭될 때 
+        해당 액션을 전송합니다.
+        
         @Code(name: "AddContactFeature.swift", file: 02-01-01-code-0006.swift)
       }
       
       @Step {
         Add a preview so that we can see what the feature looks like. 
+        
+        기능이 어떻게 생겼는지 보기 위해 미리보기를 추가합니다. 
         
         @Code(name: "AddContactFeature.swift", file: 02-01-01-code-0007.swift, reset: true) {
           @Image(source: "ch02-sub01-sec01-image-0002")
@@ -104,6 +144,13 @@
       to integrate the domains, and the reducer operator
       ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q`` to
       integrate the reducers.
+      
+      이제 두 개의 격리된 기능이 구축되었으므로, 연락처 목록 화면에서 "연락처 추가" 화면으로 
+      탐색할 수 있도록 통합할 때입니다. 이를 위해 먼저 기능의 리듀서를 통합할 것입니다. 
+      여기에는 도메인을 통합하기 위해 ``ComposableArchitecture/Presents()``와 
+      ``ComposableArchitecture/PresentationAction``을 활용하고, 
+      리듀서를 통합하기 위해 리듀서 연산자 
+      ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q``를 사용하는 것이 포함됩니다.
     }
     
     @Steps {
@@ -111,6 +158,10 @@
         We will start by integrating the features together at the reducer level. This takes a 
         few steps. Go back to the ContactsFeature.swift file where we built the `ContactsFeature`
         reducer for handling the logic and behavior of the list of contacts.
+        
+        리듀서 수준에서 기능을 통합하는 것부터 시작하겠습니다. 
+        몇 가지 단계가 필요합니다. 연락처 목록의 로직과 동작을 처리하기 위해 `ContactsFeature` 리듀서를 구축한 
+        ContactsFeature.swift 파일로 돌아갑니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0000.swift)
       }
@@ -122,6 +173,10 @@
         A `nil` value represents that the "Add Contact" feature is not presented, and a non-`nil`
         value represents that it is presented.
         
+        기능의 상태를 통합하기 위해 ``ComposableArchitecture/Presents()`` 매크로를 사용하여 
+        선택적 값을 보유합니다. `nil` 값은 "연락처 추가" 기능이 표시되지 않음을 나타내고, 
+        비-`nil` 값은 표시되고 있음을 나타냅니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0001.swift)
       }
        
@@ -131,6 +186,9 @@
         
         This allows the parent to observe every action sent from the child feature.
         
+        기능의 액션을 통합하기 위해 ``ComposableArchitecture/PresentationAction``을 보유하는 
+        케이스를 추가합니다. 이를 통해 부모는 자식 기능에서 전송된 모든 액션을 관찰할 수 있습니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0002.swift)
       }
        
@@ -138,6 +196,9 @@
         Since a new case has been added to the action enum we must now handle it in the main
         reducer. For now we will do nothing for this case and return `.none`, but soon we will do
         more here.
+        
+        액션 열거형에 새로운 케이스가 추가되었으므로 이제 메인 리듀서에서 이를 처리해야 합니다. 
+        현재 이 케이스에 대해서는 아무 작업도 하지 않고 `.none`을 반환하지만, 곧 여기에서 더 많은 작업을 할 것입니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0003.swift)
       }
@@ -147,10 +208,18 @@
         ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q``
         reducer operator.
         
+        리듀서를 통합하기 위해 
+        ``ComposableArchitecture/Reducer/ifLet(_:action:destination:fileID:filePath:line:column:)-4ub6q`` 
+        리듀서 연산자를 사용합니다.
+        
         This creates a new reducer that runs the child reducer when a child 
         action comes into the system, and runs the parent reducer on all actions. It also 
         automatically handles effect cancellation when the child feature is dismissed, and a lot
         more. See the documentation for more information.
+        
+        이는 자식 액션이 시스템에 들어올 때 자식 리듀서를 실행하고, 모든 액션에 대해 부모 리듀서를 실행하는 
+        새로운 리듀서를 생성합니다. 또한 자식 기능이 닫힐 때 이팩트 취소를 자동으로 처리하며, 
+        그 외에도 많은 기능을 제공합니다. 자세한 내용은 문서를 참조하세요.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0004.swift)
       }
@@ -160,9 +229,16 @@
       features are so tightly integrated together we can now easily implement the presentation and
       dismissal of the "Add Contact" feature.
       
+      두 기능의 도메인을 통합하는 데 필요한 전부입니다. 뷰로 이동하기 전에 라이브러리가 제공하는 
+      기능을 활용할 수 있습니다. 두 기능이 매우 밀접하게 통합되어 있기 때문에 이제 "연락처 추가" 기능의 
+      표시 및 해제를 쉽게 구현할 수 있습니다.
+      
       @Step {
         When the "+" button is tapped in the contacts list feature we can now populate the 
         `addContact` state to represent that the feature should be presented.
+        
+        연락처 목록 기능에서 "+" 버튼이 탭되면 이제 `addContact` 상태를 채워서 
+        기능이 표시되어야 함을 나타낼 수 있습니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0005.swift)
       }
@@ -176,6 +252,9 @@
         > ``ComposableArchitecture/PresentationAction/presented(_:)`` case in order to listen for 
         > actions inside the "Add Contact" feature.
         
+        > 참고: "연락처 추가" 기능 내에서 액션을 수신하기 위해 
+        > ``ComposableArchitecture/PresentationAction/presented(_:)`` 케이스에서 구조 분해를 하고 있습니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0006.swift)
       }
       
@@ -183,6 +262,9 @@
         When the "Save" button is tapped _inside_ the "Add Contacts" feature we want to not only
         dismiss the feature, but we also want to add the new contact to the collection of contacts
         held in `ContactsFeature.State`.
+        
+        "연락처 추가" 기능 내에서 "저장" 버튼이 탭될 때 기능을 해제할 뿐만 아니라 
+        `ContactsFeature.State`에 보유된 연락처 컬렉션에 새 연락처를 추가하고자 합니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0007.swift)
       }
@@ -206,12 +288,19 @@
         and we have a navigation title and toolbar. We need to figure out how to present a sheet
         in this view whenever the `addContact` state flips to non-`nil`.
         
+        현재 뷰는 다음과 같이 보입니다. 각 연락처에 대한 행이 있는 간단한 목록이며, 
+        탐색 제목과 도구 모음이 있습니다. `addContact` 상태가 비-`nil`로 바뀔 때 
+        이 뷰에서 시트를 표시하는 방법을 알아내야 합니다.
+        
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0008.swift, reset: true)
       }
       
       The library comes with a variety of tools that mimic SwiftUI's native navigation tools (such
       as sheets, popovers, fullscreen covers, alerts, and confirmation dialogs), but they take
       ``ComposableArchitecture/Store``s instead of bindings.
+      
+      이 라이브러리는 SwiftUI의 기본 내비게이션 도구(시트, 팝오버, 전체 화면 커버, 알림 및 확인 대화 상자 등)를 모방하는 다양한 도구를 제공합니다. 
+      그러나 이들은 바인딩 대신 ``ComposableArchitecture/Store``를 사용합니다.
       
       @Step {
         Use the `@Bindable` property wrapper to derive a binding to a store, which can be scoped
@@ -220,8 +309,17 @@
         will be derived focused only on the `AddContactFeature` domain, which is what you can pass
         to the `AddContactView`.
         
+        `@Bindable` 속성 래퍼를 사용하여 스토어에 대한 바인딩을 파생합니다. 
+        이는 `addContact` 기능의 프레젠테이션 도메인에만 국한될 수 있으며, 
+        `sheet(item:)` 뷰 수정자에 전달됩니다. `addContact` 상태가 비-`nil`이 되면 
+        `AddContactFeature` 도메인에만 집중하는 새로운 스토어가 파생되며, 
+        이를 `AddContactView`에 전달할 수 있습니다.
+        
         > Note: If you are targeting older platforms and do not have access to `@Bindable`, you can
         > instead use `@Perception.Bindable`, which comes with the library.
+        
+        > 참고: 이전 플랫폼을 대상으로 하고 `@Bindable`에 접근할 수 없는 경우, 
+        > 대신 라이브러리와 함께 제공되는 `@Perception.Bindable`을 사용할 수 있습니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-02-code-0009.swift)
       }
@@ -230,6 +328,10 @@
         Run the app in the preview to show that it works as expected. Tapping the "+" icon brings up
         the "AddContactFeature" in a sheet, and tapping "Save" adds a new contact to the list, 
         whereas tapping "Cancel" does not.
+        
+        미리보기에서 앱을 실행하여 예상대로 작동하는지 확인합니다. "+" 아이콘을 탭하면 
+        시트에서 "AddContactFeature"가 표시되고, "저장"을 탭하면 목록에 새 연락처가 추가되며, 
+        "취소"를 탭하면 아무 일도 일어나지 않습니다.
         
         @Video(source: "ch02-sub01-sec03-image-0000") 
       }
@@ -243,8 +345,15 @@
       "Cancel" buttons were tapped. This is not ideal since it may lead to the parent making 
       assumptions about what logic it should perform when something happens in the child feature.
       
+      이전 섹션에서는 부모 리듀서가 자식의 액션을 검사하여 "저장" 및 "취소" 버튼이 탭될 때를 
+      결정할 수 있도록 하여 자식에서 부모로의 통신을 용이하게 했습니다. 
+      이는 부모가 자식 기능에서 무언가가 발생할 때 어떤 로직을 수행해야 하는지에 대한 
+      가정을 하게 만들 수 있으므로 이상적이지 않습니다.
+      
       A better pattern is to use so-called "delegate actions" for the child feature to directly tell
       the parent what it wants done.
+      
+      더 나은 패턴은 자식 기능이 부모에게 원하는 작업을 직접 알리기 위해 이른바 "위임 액션"을 사용하는 것입니다.
     }
     
     @Steps {
@@ -252,6 +361,10 @@
         Go to AddContactFeature.swift and add a new `Delegate` action enum to the 
         `AddContactFeature`. This enum will describe all the actions that the parent can listen for
         and interpret. It allows the child feature to directly tell the parent what it wants done.
+        
+        AddContactFeature.swift로 가서 `AddContactFeature`에 새로운 `Delegate` 액션 열거형을 추가합니다. 
+        이 열거형은 부모가 수신하고 해석할 수 있는 모든 액션을 설명합니다. 
+        이를 통해 자식 기능이 부모에게 원하는 작업을 직접 알릴 수 있습니다.
         
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0000.swift, previousFile: 02-01-04-code-0000-previous.swift)
       }
@@ -265,9 +378,20 @@
       <doc:BuildingSyncUps> tutorial where we use this technique, in particular in
       <doc:EditingAndDeletingSyncUp#Deleting-the-sync-up> section.
       
+      > 중요: 위임 액션은 자식 도메인에서 부모로 통신하는 가장 일반적인 방법이지만, 
+      > 다른 기술도 있습니다. 우리는 동기화 컬렉션을 위해 [`@Shared`](<doc:Shared>) 속성 래퍼를 
+      > 활용할 수도 있었으며, 이를 통해 `AddContactFeature`가 추가적인 단계 없이 
+      > 부모 컬렉션에 새 연락처를 직접 삽입할 수 있습니다. 이는 강력할 수 있지만, 
+      > 이번 튜토리얼에서는 위임 액션을 사용할 것입니다. `@Shared`에 대한 자세한 내용은 
+      > <doc:SharingState> 기사를 참조하고, 이 기술을 사용하는 <doc:BuildingSyncUps> 튜토리얼을 
+      > 확인하세요. 특히 <doc:EditingAndDeletingSyncUp#Deleting-the-sync-up> 섹션을 참조하세요.
+      
       @Step {
         Handle the new case in the reducer, but we should never actually perform any logic in this
         case. Only the parent should listen for `delegate` actions and respond accordingly.
+        
+        리듀서에서 새로운 케이스를 처리하지만, 이 케이스에서 실제로 로직을 수행해서는 안 됩니다. 
+        오직 부모만 `delegate` 액션을 수신하고 그에 따라 응답해야 합니다.
         
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0001.swift)
       }
@@ -277,12 +401,18 @@
         immediately and synchronously sends a delegate action. For example, when the "Save" button
         is tapped, we will send the `saveContact` action.
         
+        자식 기능이 부모에게 통신하고자 할 때마다 즉시 동기적으로 위임 액션을 전송하는 이팩트를 반환합니다. 
+        예를 들어, "저장" 버튼이 탭될 때 `saveContact` 액션을 전송합니다.
+        
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0002.swift)
       }
       
       @Step {
         Go back to ContactsFeature.swift and update the reducer to listen for delegate actions to
         figure out when it is time to dismiss or save the contact.
+        
+        ContactsFeature.swift로 돌아가서 리듀서를 업데이트하여 위임 액션을 수신하여 
+        연락처를 해제하거나 저장할 시점을 결정합니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-04-code-0003.swift, previousFile: 02-01-04-code-0003-previous.swift)
       }
@@ -294,10 +424,19 @@
       cumbersome to create a delegate action just to communicate this to the parent, and so the
       library comes with a special tool for this.
       
+      애플리케이션은 "위임 액션" 리팩토링 이전과 정확히 동일하게 작동해야 하지만, 이제 
+      자식 기능은 부모에게 원하는 작업을 정확하게 설명할 수 있으며, 부모가 가정을 하지 않도록 합니다. 
+      그러나 여전히 개선의 여지가 있습니다. 자식 기능이 스스로 해제되기를 원하는 경우가 많습니다. 
+      예를 들어 "취소"를 탭할 때 그렇습니다. 이를 부모에게 전달하기 위해 위임 액션을 생성하는 것은 
+      너무 번거롭기 때문에 라이브러리에는 이를 위한 특별한 도구가 있습니다.
+      
       @Step {
         Go back to AddContactFeature.swift and add a dependency on 
         ``ComposableArchitecture/DismissEffect``. This is a value that allows child features to
         dismiss themselves without any direct contact with the parent feature.
+        
+        AddContactFeature.swift로 돌아가서 ``ComposableArchitecture/DismissEffect``에 대한 의존성을 추가합니다. 
+        이는 자식 기능이 부모 기능과 직접적인 접촉 없이 스스로 해제할 수 있게 해주는 값입니다.
         
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0004.swift, previousFile: 02-01-04-code-0004-previous.swift)
       }
@@ -310,6 +449,12 @@
         > Note: The `dismiss` dependency is asynchronous which means it is only appropriate to 
         > invoke from an effect.
         
+        `dismiss` 의존성을 사용하여 이팩트를 반환하고 호출합니다. 
+        이는 부모와 통신하여 ``ComposableArchitecture/PresentationAction/dismiss`` 액션이 전송되도록 하여 
+        프레젠테이션을 구동하는 상태를 지웁니다.
+        
+        > 참고: `dismiss` 의존성은 비동기이므로 이팩트에서 호출하는 것이 적절합니다.
+        
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0005.swift)
       }
       
@@ -318,6 +463,10 @@
         not need to explicitly communicate to the parent that it should dismiss the child. That is
         all handled by the ``ComposableArchitecture/DismissEffect``.
         
+        `Delegate` 열거형에서 `cancel` 액션을 제거합니다. 더 이상 필요하지 않기 때문입니다. 
+        부모에게 자식을 해제해야 한다고 명시적으로 전달할 필요가 없습니다. 
+        이는 모두 ``ComposableArchitecture/DismissEffect``에 의해 처리됩니다.
+        
         @Code(name: "AddContactFeature.swift", file: 02-01-04-code-0006.swift)
       }
       
@@ -325,6 +474,9 @@
         Go back to ContactsFeature.swift. We can also remove the `cancel` logic from the 
         `ContactsFeature` reducer and it is no longer necessary to explicitly `nil` out the
         `addContact` state. That is already taken care of.
+        
+        ContactsFeature.swift로 돌아가서 `ContactsFeature` 리듀서에서 `cancel` 로직을 제거할 수 있습니다. 
+        `addContact` 상태를 명시적으로 `nil`로 설정할 필요도 없습니다. 이는 이미 처리되었습니다.
         
         @Code(name: "ContactsFeature.swift", file: 02-01-04-code-0007.swift, previousFile: 02-01-04-code-0007-previous.swift)
       }
